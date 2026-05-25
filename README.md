@@ -62,27 +62,9 @@ http://localhost:8000
 
 This project can be deployed easily with GitHub Pages, Netlify, Vercel, or any static hosting platform.
 
-## Vercel Security Configuration
-
-This project includes `vercel.json` to apply security headers when deployed on Vercel.
-
-Validate the file before deployment:
-
-```powershell
-Get-Content .\vercel.json -Raw | ConvertFrom-Json
-```
-
-If the command shows no error, the JSON format is valid.
-
-The `vercel.json` file applies headers to every page using this rule:
-
-```json
-"source": "/(.*)"
-```
-
-
 ## Author
 Rakesh
+
 
 
 
