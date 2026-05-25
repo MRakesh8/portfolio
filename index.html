@@ -1,0 +1,1020 @@
+﻿<!DOCTYPE html>
+<!-- DOCTYPE tells the browser: "This is a modern HTML5 page."
+     Without it, the browser may render the page in a broken "quirks mode". -->
+
+<html lang="en">
+<!-- html is the root element â€” it wraps EVERYTHING on the page.
+     lang="en" tells the browser and screen readers the page is in English. -->
+
+<head>
+<!-- head contains invisible setup information â€” it is not shown to the user.
+     It includes: page title, character encoding, linked CSS, fonts, and security settings. -->
+
+<meta charset="UTF-8"/>
+<!-- charset="UTF-8" means the page can display ANY character from any language in the world
+     (English, Hindi, Arabic, emoji, etc.) without breaking. -->
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<!-- viewport is REQUIRED for mobile-responsive design.
+     width=device-width  means the page width equals the device screen width (not zoomed out).
+     initial-scale=1.0   means the page starts at 100% zoom (not zoomed in or out). -->
+
+<title>Rakesh &mdash; Full-Stack Web Developer</title>
+<!-- title is the text shown in the browser tab and search engine results.
+     &mdash; is an HTML entity that produces an em dash character: â€” -->
+
+<!-- ======================================================
+     SECURITY HEADERS
+     These meta tags add security rules to the page.
+     They protect visitors from common web attacks.
+     They work automatically just by being in the head.
+====================================================== -->
+
+<!-- Content-Security-Policy (CSP):
+     This is the most important security header.
+     It tells the browser EXACTLY which sources are allowed to load content.
+     default-src 'self'           = only load resources from this same website.
+     style-src 'unsafe-inline' + Google Fonts  = allow our own CSS plus Google Fonts CSS.
+     font-src fonts.gstatic.com   = allow font files from Google's font server.
+     script-src 'self' 'unsafe-inline' = allow our own JavaScript files and inline scripts.
+     img-src 'self' data: blob:   = allow images from this site, data URIs, and blob URLs.
+     connect-src 'none'           = block all network requests (no fetch/XHR calls allowed).
+     frame-src 'none'             = block iframes on this page.
+     object-src 'none'            = block Flash, plugins, and embedded objects.
+     base-uri 'self'              = prevent attackers from changing the page base URL.
+     form-action 'none'           = prevent forms from submitting to external servers.
+     This blocks almost all XSS (Cross-Site Scripting) injection attacks. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src    https://fonts.gstatic.com;
+  script-src  'self' 'unsafe-inline';
+  img-src     'self' data: blob:;
+  connect-src 'none';
+  frame-src   'none';
+  object-src  'none';
+  base-uri    'self';
+  form-action 'none';
+"/>
+
+<!-- X-Frame-Options: DENY
+     Prevents this page from being loaded inside an <iframe> on another website.
+     This blocks "clickjacking" attacks where a hacker hides your page inside a fake site
+     and tricks users into clicking buttons they cannot see. -->
+<meta http-equiv="X-Frame-Options" content="DENY"/>
+
+<!-- X-Content-Type-Options: nosniff
+     Stops the browser from "guessing" the file type of downloaded content.
+     Without this, a browser might run a .txt file as JavaScript if it looks like code.
+     nosniff forces the browser to trust only the declared content type. -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+
+<!-- referrer is the URL that is sent to websites you link to, telling them where you came from.
+     strict-origin-when-cross-origin means:
+     - When clicking links to other websites: only send your domain name, not the full URL.
+     - When clicking links within your own site: send the full URL.
+     This protects user privacy and hides URL parameters from external sites. -->
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
+
+<!-- Permissions-Policy tells the browser which built-in features this page is allowed to use.
+     camera=()       = this page is not allowed to access the camera.
+     microphone=()   = this page is not allowed to access the microphone.
+     geolocation=()  = this page cannot access the user's GPS location.
+     payment=()      = no payment APIs allowed.
+     usb=()          = no USB device access.
+     This prevents a hacked or malicious script from spying through the camera/microphone. -->
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()"/>
+
+<!-- Preconnect hints tell the browser to open a connection to Google Fonts servers
+     EARLY (before the font is actually requested). This saves time and makes fonts load faster. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<!-- crossorigin is needed because fonts.gstatic.com is a different domain from fonts.googleapis.com.
+     It tells the browser to share the connection across those two origins. -->
+
+<!-- This loads two Google Fonts:
+     Syne (weights 500 600 700 800) â€” used for headings and display text.
+     DM Sans (weights 300 400 500, optical sizes 9 to 40) â€” used for body text.
+     &display=swap means: show regular text immediately, then swap to the custom font once it loads.
+     This prevents a "flash of invisible text" (FOIT) while the font downloads. -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
+
+<!-- Links the external CSS file that contains ALL the styling for this page.
+     rel="stylesheet" tells the browser this is a CSS file. -->
+<link rel="stylesheet" href="style.css"/>
+
+</head>
+<body>
+<!-- body contains ALL the visible content on the page:
+     navbar, hero, services, projects, skills, contact, and footer. -->
+
+
+<!-- -------------------------------------------
+     NAVBAR
+     The fixed navigation bar at the top of the page.
+     It stays visible as the user scrolls (position:fixed in CSS).
+     role="navigation" and aria-label help screen readers understand this is navigation.
+------------------------------------------- -->
+<nav id="navbar" role="navigation" aria-label="Main navigation">
+<!-- nav is the semantic HTML5 element for navigation menus.
+     id="navbar" lets JavaScript and CSS target this specific element.
+     role="navigation" is an ARIA role â€” it tells assistive technologies this is a nav area.
+     aria-label gives it a human-readable name for screen readers. -->
+
+  <div class="nav-inner">
+  <!-- nav-inner is a flex row that holds the logo (left) and links (right).
+       div is a generic container with no semantic meaning â€” used for layout. -->
+
+    <a href="#" class="nav-logo font-display">
+    <!-- href="#" links back to the top of the page when the logo is clicked.
+         class="nav-logo font-display" applies two CSS classes for styling. -->
+      <span class="gradient-text">Rakesh</span>
+      <!-- span is an inline element â€” used to apply the animated gradient color to the name text.
+           gradient-text is a CSS class that creates the animated rainbow color effect. -->
+    </a>
+
+    <div class="nav-links" role="list">
+    <!-- role="list" tells screen readers this div functions as a list of links. -->
+      <a href="#services">Services</a>
+      <!-- href="#services" is an anchor link â€” clicking it scrolls to the element with id="services". -->
+      <a href="#work">Work</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact" class="btn btn-primary nav-cta"><span>Let's Talk</span></a>
+      <!-- This link is styled as a button using the btn and btn-primary CSS classes.
+           nav-cta makes it slightly smaller than the normal button size. -->
+    </div>
+
+    <button id="menu-btn" aria-label="Toggle menu" aria-expanded="false">
+    <!-- This is the hamburger menu button â€” visible only on mobile screens.
+         aria-label="Toggle menu" tells screen readers what this button does (there is no visible text).
+         aria-expanded="false" tells screen readers the mobile menu is currently closed.
+         JavaScript updates this to "true" when the menu is open. -->
+      <span></span><span></span><span></span>
+      <!-- Three empty spans â€” CSS turns them into the three horizontal bars of the hamburger icon. -->
+    </button>
+  </div>
+
+  <div id="mobile-nav" role="menu">
+  <!-- This is the dropdown mobile navigation menu.
+       Hidden by default (display:none in CSS).
+       JavaScript adds the class "open" to make it visible when the hamburger is clicked.
+       role="menu" tells screen readers this is a menu. -->
+    <a href="#services" class="mn-link">Services</a>
+    <!-- mn-link class: JavaScript uses this class to close the menu when a link is clicked. -->
+    <a href="#work" class="mn-link">Work</a>
+    <a href="#skills" class="mn-link">Skills</a>
+    <a href="#contact" class="btn btn-primary mn-link" style="text-align:center"><span>Let's Talk</span></a>
+    <!-- style="text-align:center" is an inline style â€” it centers the text in this specific button
+         without needing a separate CSS class. -->
+  </div>
+</nav>
+
+
+<!-- -------------------------------------------
+     HERO SECTION
+     The full-screen opening section.
+     Contains the status badge, headline, subtitle,
+     call-to-action buttons, 3D cube scene, and stats bar.
+------------------------------------------- -->
+<section id="hero">
+<!-- section is an HTML5 semantic element â€” it groups related content together.
+     id="hero" lets the navbar "Let's Talk" button link here, and CSS can style it. -->
+
+  <!-- Ambient background orbs â€” large blurry colored circles.
+       They are purely decorative and create a depth/glow feel.
+       The style attribute sets position, size, color, and animation delay inline. -->
+  <div class="orb" style="width:700px;height:700px;background:rgba(37,99,235,0.12);top:-250px;left:-200px;animation-delay:0s"></div>
+  <!-- Blue orb: 700px circle, 12% opaque blue, positioned above and to the left. Starts immediately. -->
+
+  <div class="orb" style="width:500px;height:500px;background:rgba(124,58,237,0.1);bottom:-150px;right:-150px;animation-delay:3s"></div>
+  <!-- Purple orb: 500px circle, 10% opaque purple, positioned below and to the right. Starts after 3 seconds. -->
+
+  <div class="orb" style="width:300px;height:300px;background:rgba(244,114,182,0.07);top:40%;left:55%;animation-delay:1.5s"></div>
+  <!-- Pink orb: 300px circle, 7% opaque pink, positioned in the middle-right area. Starts after 1.5 seconds. -->
+
+  <div id="particles" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
+  <!-- An empty container â€” JavaScript fills it with small floating particle dots.
+       aria-hidden="true" hides it from screen readers (it is decorative).
+       inset:0 fills the entire hero section.
+       pointer-events:none means the dots do not block mouse clicks. -->
+
+  <div class="container hero-layout">
+  <!-- container is a CSS class that centers content and limits the max width.
+       The inline style adds: flex column layout, centered alignment, and full width.
+       This stacks the three hero blocks (text, scene, stats) vertically and centers them. -->
+
+    <!-- Block 1: Status badge, Headline, Subtitle, Buttons â€” all centered above the 3D scene. -->
+    <div class="hero-top reveal">
+    <!-- hero-top is the CSS class for this block.
+         reveal is a CSS class that starts the element invisible â€” JavaScript makes it visible
+         when the user scrolls to it (scroll animation). -->
+
+      <div class="hero-status">
+      <!-- The "Available for Freelance" green pill badge. -->
+        <div class="status-dot" aria-hidden="true"></div>
+        <!-- The pulsing green dot. aria-hidden="true" hides it from screen readers
+             since the text "Available for Freelance" already communicates the meaning. -->
+        Available for Freelance
+        <!-- The visible text inside the badge. -->
+      </div>
+
+      <h1 class="hero-title reveal d1">
+      <!-- h1 is the most important heading on the page â€” there should be ONLY ONE h1 per page.
+           It is the main title that search engines use to understand what the page is about.
+           d1 = "delay 1" â€” this element animates in with a 0.08s delay. -->
+        <span class="line">Building <span class="gradient-text">Interfaces</span></span>
+        <!-- Each span.line wraps one line of the headline (CSS sets it to display:block).
+             The inner span.gradient-text applies the animated color effect to "Interfaces". -->
+        <span class="line">That Convert</span>
+        <span class="line muted">Code That Scales.</span>
+        <!-- muted applies the outlined/ghost text style to this third line. -->
+      </h1>
+
+      <p class="hero-sub reveal d2">
+      <!-- p is a paragraph element. hero-sub is the CSS class for the subtitle style.
+           d2 = "delay 2" â€” animates in after the headline (0.16s delay). -->
+        I bridge the gap between stunning user interfaces and powerful backend logic â€” building web experiences that drive real business growth.
+      </p>
+
+      <div class="hero-cta-row reveal d3">
+      <!-- The row holding the two call-to-action buttons.
+           d3 = "delay 3" - animates in last (0.24s delay), creating a cascade effect. -->
+        <a href="#contact" class="btn btn-primary">
+        <!-- Primary button - links to the contact section below. -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <!-- SVG is an inline icon (send/arrow icon). currentColor inherits the button's text color.
+               aria-hidden="true" hides the icon from screen readers (the button text explains it). -->
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+            <!-- The path draws the send arrow shape using SVG coordinates. -->
+          </svg>
+          <span>Let's Build Together</span>
+        </a>
+        <a href="#work" class="btn btn-ghost">
+        <!-- Ghost/outline button - links to the projects section. -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+            <!-- Two SVG paths that together draw an eye icon (representing "view"). -->
+          </svg>
+          View My Work
+        </a>
+      </div>
+    </div>
+
+    <!-- Block 2: The 3D cube visual scene with floating tech tags.
+         aria-hidden="true" means screen readers completely skip this block â€” it is purely decorative. -->
+    <div class="hero-scene reveal d2" aria-hidden="true">
+
+      <div class="hero-glow"></div>
+      <!-- The soft purple glow disc behind the cube. Empty div â€” styled entirely by CSS. -->
+
+      <!-- Three concentric dashed rings that slowly rotate around the cube. -->
+      <div class="ring ring-1"></div>
+      <!-- ring-1 = outermost ring (460px), rotates slowly (30s). -->
+      <div class="ring ring-2"></div>
+      <!-- ring-2 = middle ring (310px), rotates in reverse (20s). -->
+      <div class="ring ring-3"></div>
+      <!-- ring-3 = innermost ring (175px), rotates fastest (14s). -->
+
+      <div class="cube-wrap">
+      <!-- cube-wrap adds the 3D perspective effect to its child.
+           perspective:900px in CSS makes the 3D cube look like it is 900px away from the viewer. -->
+        <div class="cube">
+        <!-- The cube element. Its rotation is controlled by CSS variables --cube-x and --cube-y
+             that JavaScript updates when the mouse moves over the scene. -->
+          <div class="face front"></div>
+          <!-- front face: pushed 55px toward the viewer along the Z axis. -->
+          <div class="face back"></div>
+          <!-- back face: rotated 180 degrees, then pushed 55px away. -->
+          <div class="face left"></div>
+          <!-- left face: rotated -90 degrees sideways. -->
+          <div class="face right"></div>
+          <!-- right face: rotated +90 degrees sideways. -->
+          <div class="face top"></div>
+          <!-- top face: rotated 90 degrees upward. -->
+          <div class="face bottom"></div>
+          <!-- bottom face: rotated 90 degrees downward. -->
+        </div>
+      </div>
+
+      <!-- Six floating technology label pills positioned like a clock around the cube. -->
+
+      <div class="float-tag ft1">
+      <!-- ft1 is positioned at the 12 o'clock position (top center) in CSS. -->
+        <span class="ft-dot" style="background:#61dafb"></span>React
+        <!-- ft-dot is the small colored circle. #61dafb is the official React blue color.
+             The text "React" follows immediately after the span. -->
+      </div>
+
+      <div class="float-tag ft2">
+      <!-- ft2 is positioned at the 9 o'clock position (left middle). -->
+        <span class="ft-dot" style="background:#68a063"></span>Node.js
+        <!-- #68a063 is the official Node.js green color. -->
+      </div>
+
+      <div class="float-tag ft3">
+      <!-- ft3 is positioned at the 3 o'clock position (right middle). -->
+        <span class="ft-dot" style="background:#38bdf8"></span>Tailwind
+        <!-- #38bdf8 is the official Tailwind CSS light blue color. -->
+      </div>
+
+      <div class="float-tag ft4">
+      <!-- ft4 is positioned at the 7-8 o'clock position (lower left). -->
+        <span class="ft-dot" style="background:#3178c6"></span>TypeScript
+        <!-- #3178c6 is the official TypeScript blue color. -->
+      </div>
+
+      <div class="float-tag ft5">
+      <!-- ft5 is positioned at the 4-5 o'clock position (lower right). -->
+        <span class="ft-dot" style="background:#fff"></span>Next.js
+        <!-- White dot for Next.js (its brand color is black/white). -->
+      </div>
+
+      <div class="float-tag ft6">
+      <!-- ft6 is positioned at the 6 o'clock position (bottom center). -->
+        <span class="ft-dot" style="background:#f7df1e"></span>JavaScript
+        <!-- #f7df1e is the official JavaScript yellow color. -->
+      </div>
+    </div>
+
+    <!-- Block 3: The stats bar showing "3+ Live Projects / 9+ Tech Stack / 100% Dedication". -->
+    <div class="hero-stats-bar reveal d3">
+    <!-- hero-stats-bar is a horizontal glassmorphism pill with three equally spaced stats.
+         d3 animates in with a 0.24s delay. -->
+
+      <div class="stat-item">
+      <!-- Each stat-item takes equal width (flex:1 in CSS). -->
+        <div class="stat-num">3+</div>
+        <!-- The large gradient number. -->
+        <div class="stat-label">Live Projects</div>
+        <!-- The small uppercase label below the number. -->
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-num">9+</div>
+        <div class="stat-label">Tech Stack</div>
+      </div>
+
+      <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Dedication</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- -------------------------------------------
+     SERVICES SECTION
+     Three cards describing the services offered.
+------------------------------------------- -->
+<section id="services" class="section">
+<!-- id="services" allows the "Services" nav link to scroll here.
+     class="section" applies the standard section vertical padding. -->
+
+  <div class="container">
+    <div class="section-header reveal">
+    <!-- section-header centers the chip, title, and subtitle. -->
+
+      <div class="chip">
+      <!-- The small decorative label above the section title. -->
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+          <polyline points="2 17 12 22 22 17"/>
+          <polyline points="2 12 12 17 22 12"/>
+          <!-- Three SVG shapes that together draw a "layers" stacked box icon. -->
+        </svg>
+        What I Do
+      </div>
+
+      <h2 class="section-title">Services Built for <span class="gradient-text">Real Results</span></h2>
+      <!-- h2 is a second-level heading (below h1). Used for section titles throughout the page. -->
+
+      <p class="section-subtitle">From pixel-perfect frontend interfaces to fully deployed applications &mdash; I handle the full spectrum so you don't have to.</p>
+      <!-- &mdash; is the HTML entity for an em dash: â€” -->
+
+    </div>
+
+    <div class="services-grid">
+    <!-- services-grid is a CSS grid with 3 equal columns (1 column on mobile). -->
+
+      <!-- Service Card 1: Frontend Engineering -->
+      <div class="card service-card reveal d1">
+      <!-- card = base glassmorphism card style.
+           service-card = adds padding inside the card.
+           d1 = animates in with a 0.08s delay. -->
+        <div class="service-icon" aria-hidden="true">
+        <!-- The icon box â€” styled as a small rounded square with a purple tint. -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+            <!-- A monitor/screen icon: rectangle screen + stand lines. -->
+          </svg>
+        </div>
+        <h3 class="service-title">Premium Frontend Engineering</h3>
+        <!-- h3 = third-level heading. Used for card titles. -->
+        <p class="service-desc">Responsive, pixel-perfect, interactive UIs built with modern standards. Every component is crafted for performance, accessibility, and visual delight.</p>
+        <ul class="service-list">
+        <!-- ul = unordered list. Each li is a bullet point feature. -->
+          <li>
+            <span class="check" aria-hidden="true">
+            <!-- check class makes the checkmark icon purple. -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <!-- A checkmark (tick) icon. -->
+            </span>Responsive across all devices</li>
+          <li><span class="check" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>React / Tailwind / Vanilla JS</li>
+          <li><span class="check" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>Micro-animations &amp; interactions</li>
+            <!-- &amp; is the HTML entity for the ampersand character: & -->
+        </ul>
+      </div>
+
+      <!-- Service Card 2: Full-Stack Web Applications (featured card with top gradient border) -->
+      <div class="card card-highlight service-card reveal d2" style="border-color:rgba(96,165,250,0.25)">
+      <!-- card-highlight adds the glowing top border line.
+           The inline style overrides the default border color with a blue tint. -->
+        <div style="position:absolute;top:14px;right:14px">
+        <!-- Absolutely positions the "Most Requested" badge in the top-right corner of this card. -->
+          <span class="chip" style="margin-bottom:0;font-size:0.62rem;padding:3px 10px">Most Requested</span>
+          <!-- Reuses the chip class but with inline overrides: no bottom margin, smaller text, less padding. -->
+        </div>
+        <div class="service-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            <!-- A lightning bolt / zap icon representing speed and power. -->
+          </svg>
+        </div>
+        <h3 class="service-title">Full-Stack Web Applications</h3>
+        <p class="service-desc">End-to-end development from database schema to cloud deployment. Robust systems that handle real users and real data seamlessly.</p>
+        <ul class="service-list">
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>API design &amp; database architecture</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Vercel / Netlify / Railway deployment</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Authentication, payments, and admin dashboards</li>
+        </ul>
+      </div>
+
+      <!-- Service Card 3: Mobile App Ecosystems -->
+      <div class="card service-card reveal d3">
+        <div class="service-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="5" y="2" width="14" height="20" rx="2"/>
+            <circle cx="12" cy="17" r="1" fill="currentColor"/>
+            <!-- A smartphone icon: tall rectangle with a small circle for the home button. -->
+          </svg>
+        </div>
+        <h3 class="service-title">Mobile App Ecosystems</h3>
+        <p class="service-desc">Native Android apps built with Kotlin, paired with cross-platform strategy. Mobile-first thinking that puts your product in pockets worldwide.</p>
+        <ul class="service-list">
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Native Android (Kotlin)</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Mobile-first UI strategy</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cross-platform consultation</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- -------------------------------------------
+     PROJECTS SECTION
+     Three project cards (Smart Farm, Psychology Insight,
+     Call Record Manager).
+------------------------------------------- -->
+<section id="work" class="section">
+<!-- id="work" matches the "Work" nav link href="#work". -->
+
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+          <!-- A code brackets icon: < and > symbols made from polylines. -->
+        </svg>
+        Featured Work
+      </div>
+      <h2 class="section-title">Projects That <span class="gradient-text">Speak Louder</span></h2>
+      <p class="section-subtitle">Real products, live on the web. Here's what I've built &mdash; and what I can build for you.</p>
+    </div>
+
+    <div class="projects-grid">
+    <!-- CSS grid with 3 columns (1 column on mobile). -->
+
+      <!-- Project 1: Smart Farm -->
+      <article class="card project-card reveal d1">
+      <!-- article is an HTML5 semantic element for self-contained content (a project entry).
+           It is more meaningful than a div â€” search engines understand it as an independent item. -->
+
+        <div class="project-thumb" style="background:linear-gradient(135deg,#0a1f0e,#0d1628)">
+        <!-- project-thumb is the preview/thumbnail area at the top of the card.
+             The inline background gradient creates the dark forest green theme for Smart Farm. -->
+          <div class="live-badge">Live</div>
+          <!-- Green "Live" badge shown when the project is deployed. -->
+          <div class="thumb-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" opacity="0.65">
+            <!-- stroke="#4ade80" directly sets the icon color to green.
+                 opacity="0.65" makes the icon 65% visible (slightly transparent). -->
+              <path d="M12 22V12M12 12C12 12 7 9 4 4c4 0 8 2 8 8z"/>
+              <path d="M12 12c0 0 5-3 8-8-4 0-8 2-8 8z"/>
+              <!-- Two curved paths that together draw a plant/leaf icon. -->
+            </svg>
+            <span class="thumb-label" style="color:#4ade80">Smart Farm</span>
+            <!-- inline color:#4ade80 makes the label green to match the project theme. -->
+          </div>
+        </div>
+
+        <div class="project-body">
+        <!-- The text content area below the thumbnail. -->
+          <h3 class="project-title">Smart Farm</h3>
+          <p class="project-desc">An innovative web platform designed to streamline agricultural data and smart farming insights &mdash; connecting modern tech with rural productivity.</p>
+          <div class="tech-row">
+          <!-- A flex row of technology pill tags. -->
+            <span class="tech-pill">HTML5</span>
+            <span class="tech-pill">CSS3</span>
+            <span class="tech-pill">JavaScript</span>
+            <span class="tech-pill">GitHub Pages</span>
+          </div>
+          <a href="https://mrakesh8.github.io/Smart_Farm/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+          <!-- href: the full URL of the live project.
+               target="_blank" opens the link in a new browser tab.
+               rel="noopener noreferrer" is a SECURITY attribute:
+                 noopener  prevents the new tab from accessing this page via window.opener.
+                 noreferrer prevents sending this page's URL to the external site.
+               Both are required whenever you use target="_blank". -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+              <!-- An external link icon: box with an arrow pointing out. -->
+            </svg>
+            <span>View Live Project</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- Project 2: Psychology Insight -->
+      <article class="card project-card reveal d2">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#130a2e,#0d1628)">
+        <!-- Dark purple gradient theme for the Psychology project. -->
+          <div class="live-badge">Live</div>
+          <div class="thumb-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" opacity="0.65">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+              <!-- Two mirrored paths that draw a brain icon. -->
+            </svg>
+            <span class="thumb-label" style="color:#a78bfa">Psychology Insight</span>
+          </div>
+        </div>
+        <div class="project-body">
+          <h3 class="project-title">Psychology Insight</h3>
+          <p class="project-desc">A clean, tailored web application providing specialized psychological resources and user-focused layouts that put mental wellness first.</p>
+          <div class="tech-row">
+            <span class="tech-pill">HTML5</span>
+            <span class="tech-pill">Tailwind CSS</span>
+            <span class="tech-pill">Vercel</span>
+          </div>
+          <a href="https://psychology-insight.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>View Live Project</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- Project 3: Call Record Manager (Android App) -->
+      <article class="card project-card reveal d3">
+        <div class="project-thumb" style="background:linear-gradient(135deg,#071a2e,#0d1628)">
+        <!-- Dark blue gradient theme for the mobile app. -->
+          <div class="mobile-badge">Mobile App</div>
+          <!-- Blue "Mobile App" badge instead of green "Live" (not a web project). -->
+          <div class="thumb-icon">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.5" stroke-linecap="round" opacity="0.65">
+              <rect x="5" y="2" width="14" height="20" rx="2"/>
+              <circle cx="12" cy="17" r="1" fill="#7dd3fc" stroke="none"/>
+              <!-- Smartphone icon with a filled home button circle. -->
+            </svg>
+            <span class="thumb-label" style="color:#7dd3fc">Call Record Manager</span>
+          </div>
+        </div>
+        <div class="project-body">
+          <h3 class="project-title">Call Record Manager</h3>
+          <p class="project-desc">A secure Android application engineered to seamlessly log, manage, and safely delete user call records &mdash; privacy-first mobile design.</p>
+          <div class="tech-row">
+            <span class="tech-pill">Kotlin</span>
+            <span class="tech-pill">Android SDK</span>
+            <span class="tech-pill">Mobile UI</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" disabled title="Android-only app &mdash; not available on web">
+          <!-- button instead of a (anchor link) because this is not a web URL.
+               disabled = the button is not clickable.
+               title = tooltip text shown on hover explaining why it is disabled. -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="5" y="2" width="14" height="20" rx="2"/>
+              <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+            Mobile App Project
+          </button>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- -------------------------------------------
+     SKILLS SECTION
+     Three skill group cards showing the technology stack.
+------------------------------------------- -->
+<section id="skills" class="section">
+
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          <!-- A wrench/tool icon. -->
+        </svg>
+        Tech Stack
+      </div>
+      <h2 class="section-title">Tools of the <span class="gradient-text">Trade</span></h2>
+      <p class="section-subtitle">A carefully chosen stack to ship fast, scale confidently, and stay ahead of the curve.</p>
+    </div>
+
+    <div class="skills-stack">
+    <!-- skills-stack is a CSS grid that auto-fits 3 cards on desktop, 2 on tablet, 1 on mobile. -->
+
+      <!-- Skill Group 1: Frontend Technologies -->
+      <div class="card skill-group reveal d1">
+        <div class="skill-group-label">Frontend</div>
+        <!-- The glowing purple dot before "Frontend" is added by CSS (::before pseudo-element). -->
+        <div class="badges">
+        <!-- badges is a flex wrap container for the technology badge chips. -->
+
+          <span class="badge">
+          <!-- Each badge contains a small SVG icon and the technology name. -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+              <!-- Code brackets icon for HTML. -->
+            </svg>
+            HTML5
+          </span>
+
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              <!-- Globe icon for CSS. -->
+            </svg>
+            CSS3
+          </span>
+
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              <!-- Lightning/zap icon for JavaScript. -->
+            </svg>
+            JavaScript
+          </span>
+
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <!-- 3D box icon for React. -->
+            </svg>
+            React
+          </span>
+
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M3 9h18M9 21V9"/>
+              <!-- Grid/table icon for Tailwind CSS. -->
+            </svg>
+            Tailwind CSS
+          </span>
+        </div>
+      </div>
+
+      <!-- Skill Group 2: Backend and Programming Languages -->
+      <div class="card skill-group reveal d2">
+        <div class="skill-group-label">Backend &amp; Languages</div>
+        <div class="badges">
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+              <!-- Stacked layers icon for Python. -->
+            </svg>
+            Python
+          </span>
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+              <!-- Monitor icon for Java. -->
+            </svg>
+            Java
+          </span>
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="5" y="2" width="14" height="20" rx="2"/>
+              <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
+              <!-- Phone icon for Kotlin (Android language). -->
+            </svg>
+            Kotlin
+          </span>
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+              <!-- Database cylinder icon for SQL. -->
+            </svg>
+            SQL
+          </span>
+        </div>
+      </div>
+
+      <!-- Skill Group 3: Tools and Deployment Platforms -->
+      <div class="card skill-group reveal d3">
+        <div class="skill-group-label">Tools &amp; Platforms</div>
+        <div class="badges">
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"/>
+              <!-- At-sign icon for Git and GitHub. -->
+            </svg>
+            Git &amp; GitHub
+          </span>
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              <!-- Star icon for Vercel. -->
+            </svg>
+            Vercel
+          </span>
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+              <!-- Info circle icon for Netlify. -->
+            </svg>
+            Netlify
+          </span>
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <rect x="5" y="2" width="14" height="20" rx="2"/>
+              <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
+              <!-- Phone icon for Android Studio. -->
+            </svg>
+            Android Studio
+          </span>
+          <span class="badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+              <!-- Code brackets icon for VS Code. -->
+            </svg>
+            VS Code
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- -------------------------------------------
+     CONTACT SECTION
+     Contact form and social media links.
+------------------------------------------- -->
+<section id="contact" class="section">
+
+  <!-- Background orb centered in the contact section. -->
+  <div class="orb" style="width:480px;height:480px;background:rgba(37,99,235,0.12);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+  <!-- transform:translate(-50%,-50%) perfectly centers the orb even though it uses top/left. -->
+
+  <div class="container" style="position:relative;z-index:1">
+  <!-- position:relative + z-index:1 ensures the form and links appear in front of the background orb. -->
+
+    <div class="section-header reveal">
+      <div class="chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+          <!-- Email envelope icon. -->
+        </svg>
+        Get In Touch
+      </div>
+      <h2 class="section-title">Let's Build Your <span class="gradient-text">Next Big Thing</span></h2>
+      <p class="section-subtitle">Open for freelance contracts worldwide. Whether you are a startup, small business, or solo founder, I'll turn your vision into a live product.</p>
+
+      <!-- Row of social media and email links. -->
+      <div class="contact-meta">
+
+        <a href="mailto:rakesh837m@gmail.com">
+        <!-- mailto: opens the user's default email app with this address pre-filled. -->
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          rakesh837m@gmail.com
+        </a>
+
+        <a href="https://www.linkedin.com/in/rakesh837/" target="_blank" rel="noopener noreferrer">
+        <!-- External link to LinkedIn. target="_blank" opens new tab. rel="noopener noreferrer" for security. -->
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+
+        <a href="https://www.instagram.com/rake.x_x/" target="_blank" rel="noopener noreferrer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          Instagram
+        </a>
+
+        <a href="https://github.com/MRakesh8" target="_blank" rel="noopener noreferrer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+          GitHub
+        </a>
+
+        <span>
+        <!-- A non-clickable span showing the availability status. -->
+          <div class="status-dot" style="width:7px;height:7px" aria-hidden="true"></div>
+          <!-- Reuses the pulsing green dot from the hero section. -->
+          Currently Available
+        </span>
+      </div>
+    </div>
+
+    <!-- The contact form card. -->
+    <div class="contact-wrap reveal">
+      <div class="card contact-card">
+
+        <form id="contact-form" novalidate>
+        <!-- form groups all the input fields together.
+             id="contact-form" lets JavaScript find and control this form.
+             novalidate disables the browser's built-in validation popups so JavaScript
+             can handle validation with custom styling instead. -->
+
+          <div class="form-row">
+          <!-- A two-column grid row for the Name and Email fields side by side. -->
+
+            <div class="form-group" style="margin-bottom:0">
+              <label for="f-name">Full Name</label>
+              <!-- label is linked to the input by matching for="f-name" with the input's id="f-name".
+                   Clicking the label focuses the input. Also helps screen readers. -->
+              <input type="text" id="f-name" name="name" placeholder="Your name" required autocomplete="name" maxlength="100"/>
+              <!-- type="text"        = single-line text input.
+                   id="f-name"       = unique ID that the label links to.
+                   name="name"       = the field name used by JavaScript to read the value.
+                   placeholder       = grey hint text shown when the field is empty.
+                   required          = HTML5 validation â€” field cannot be empty.
+                   autocomplete="name" = tells the browser to suggest saved names.
+                   maxlength="100"   = security limit: user cannot type more than 100 characters. -->
+            </div>
+
+            <div class="form-group" style="margin-bottom:0">
+              <label for="f-email">Email Address</label>
+              <input type="email" id="f-email" name="email" placeholder="your@email.com" required autocomplete="email" maxlength="254"/>
+              <!-- type="email" tells the browser this must look like an email address.
+                   maxlength="254" is the official maximum email address length (RFC 5321 standard). -->
+            </div>
+          </div>
+
+          <!-- Honeypot: a hidden field that traps bots (spam prevention).
+               Real users never see or fill this field because it is hidden with CSS.
+               If a bot fills it, JavaScript detects it and silently discards the form.
+               aria-hidden="true" tells screen readers to completely ignore this. -->
+          <div style="position:absolute;left:-9999px;opacity:0;pointer-events:none" aria-hidden="true">
+            <label for="f-hp">Leave this blank</label>
+            <input type="text" id="f-hp" name="_hp" tabindex="-1" autocomplete="off"/>
+            <!-- tabindex="-1" means pressing Tab on the keyboard will never land on this field.
+                 autocomplete="off" prevents the browser from autofilling it (which could confuse the bot check). -->
+          </div>
+
+          <div class="form-group" style="margin-top:1rem">
+            <label for="f-type">What Are You Building?</label>
+            <select id="f-type" name="project_type">
+            <!-- select creates a dropdown menu.
+                 name="project_type" lets JavaScript read the selected option. -->
+              <option value="">Select project type&hellip;</option>
+              <!-- value="" means "nothing selected" â€” used for the placeholder option.
+                   &hellip; is an HTML entity for three dots: ... -->
+              <option value="website">Business Website</option>
+              <!-- value="website" is what JavaScript reads (not the visible text). -->
+              <option value="webapp">Full-Stack Web App</option>
+              <option value="ecommerce">E-Commerce Store</option>
+              <option value="mobile">Mobile Application</option>
+              <option value="redesign">UI/UX Redesign</option>
+              <option value="other">Other / Not Sure Yet</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="f-msg">Project Requirements</label>
+            <textarea id="f-msg" name="message" placeholder="Tell me about your project &mdash; goals, timeline, budget, or anything else. Open for worldwide contracts!" required></textarea>
+            <!-- textarea is a multi-line text input.
+                 It can be resized vertically by the user (set in CSS with resize:vertical).
+                 required means this field must be filled before submitting. -->
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary btn-submit">
+          <!-- type="submit" means clicking this button triggers the form's submit event.
+               JavaScript intercepts that event (e.preventDefault()) and handles the submission.
+               id="submit-btn" lets JavaScript find and update this button (text, disabled state). -->
+            <svg id="btn-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+              <!-- Send/arrow icon inside the button. id="btn-icon" lets JavaScript show/hide it. -->
+            </svg>
+            <span id="btn-text">Send Message</span>
+            <!-- span wraps the button text so JavaScript can change it to "Sending..." on click. -->
+          </button>
+
+          <div id="form-success" role="alert" aria-live="polite">
+          <!-- Hidden by default (display:none in CSS). JavaScript adds class "show" after submission.
+               role="alert" and aria-live="polite" tell screen readers to announce this message
+               automatically when it appears. -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            Message sent! I'll reply within 24 hours.
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- -------------------------------------------
+     FOOTER
+     The bottom bar with logo, copyright, and links.
+------------------------------------------- -->
+<footer>
+<!-- footer is a semantic HTML5 element â€” marks the bottom of the page.
+     Screen readers and search engines understand it is the page footer. -->
+
+  <div class="footer-inner">
+  <!-- footer-inner is a flex row: logo on the left, copyright in center, links on the right. -->
+
+    <div class="footer-logo gradient-text">Rakesh</div>
+    <!-- gradient-text applies the animated rainbow color to the name. -->
+
+    <p class="footer-copy">&copy; 2026 Rakesh. Crafted with passion &amp; purpose.</p>
+    <!-- &copy; is the HTML entity for the copyright symbol: (C)
+         &amp; is the HTML entity for the ampersand: & -->
+
+    <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;justify-content:center;">
+    <!-- An inline flex row for the footer social icon links.
+         flex-wrap:wrap means they wrap to the next line on very small screens. -->
+
+      <a href="mailto:rakesh837m@gmail.com" class="footer-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        Email
+      </a>
+
+      <a href="https://www.linkedin.com/in/rakesh837/" target="_blank" rel="noopener noreferrer" class="footer-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        LinkedIn
+      </a>
+
+      <a href="https://www.instagram.com/rake.x_x/" target="_blank" rel="noopener noreferrer" class="footer-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        Instagram
+      </a>
+
+      <a href="https://github.com/MRakesh8" target="_blank" rel="noopener noreferrer" class="footer-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+<!-- -------------------------------------------
+     JAVASCRIPT
+     The main.js file is linked at the BOTTOM of the body.
+     Placing scripts at the bottom is best practice because:
+     1. The browser loads all HTML first so the page appears faster.
+     2. JavaScript can safely find all the HTML elements
+        because they are already loaded by the time the script runs.
+------------------------------------------- -->
+<script src="main.js"></script>
+
+</body>
+</html>
+
+
+

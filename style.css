@@ -1,0 +1,1459 @@
+﻿/* ==============================================
+   style.css â€” Main Stylesheet for Rakesh Portfolio
+   This file controls ALL the visual design:
+   colors, sizes, spacing, animations, and layout.
+   It is linked from index.html using <link rel="stylesheet" href="style.css"/>
+============================================== */
+
+
+/* -------------------------------------------
+   RESET AND BASE
+   Browsers add their own default styles (margins,
+   padding, borders). This section REMOVES all those
+   defaults so every browser shows the page the same way.
+------------------------------------------- */
+
+/* The star (*) means "select EVERY element on the page".
+   ::before and ::after are invisible extra elements browsers add.
+   box-sizing: border-box  means: when you set a width, padding is INCLUDED inside it (not added on top).
+   margin: 0               removes the default spacing around all elements.
+   padding: 0              removes the default inner spacing inside all elements. */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* html is the root (outermost) element of every webpage. */
+html {
+  scroll-behavior: smooth;   /* When you click a nav link, the page scrolls smoothly instead of jumping. */
+  font-size: 16px;           /* Sets the base font size. "1rem" anywhere in this file means 16px. */
+  width: 100%;               /* The html element fills the full browser width. */
+  min-height: 100%;          /* The html element is at least as tall as the browser window. */
+  overflow-x: clip;          /* Hides anything that goes off the right/left edge (prevents horizontal scroll). */
+}
+
+/* body is where all the visible content lives. */
+body {
+  width: 100%;               /* Body fills the full width of the browser. */
+  min-width: 0;              /* Prevents the body from being forced wider than its container. */
+  margin: 0;                 /* No outer spacing around the body. */
+  padding: 0;                /* No inner spacing inside the body. */
+  background-color: var(--bg-base);  /* Uses the --bg-base color variable defined below (pure black). */
+
+  /* Two soft glowing circles painted on the background:
+     One purple at the top-right, one pink at the bottom-left.
+     rgba(r,g,b,a) â€” the last number is opacity (0=invisible, 1=solid). */
+  background-image: radial-gradient(circle at top right, rgba(139,92,246,0.12), transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(236,72,153,0.12), transparent 40%);
+
+  background-attachment: fixed;     /* The background gradient stays fixed when you scroll (parallax feel). */
+  color: var(--text-primary);       /* Default text color for the whole page (light grey/white). */
+  font-family: 'DM Sans', sans-serif; /* Default font. 'DM Sans' loads from Google Fonts. */
+  overflow-x: hidden;               /* Hides horizontal overflow at the body level as a safety net. */
+  line-height: 1.6;                 /* Spacing between lines of text (1.6 x the font size). Helps readability. */
+}
+
+/* Removes the small gap below images and SVG icons that browsers add by default. */
+img,svg{display:block}
+
+/* Links: removes the default blue underline, and inherits the parent element's text color. */
+a{text-decoration:none;color:inherit}
+
+/* Buttons: shows a pointer hand cursor on hover, removes the default border and background,
+   and inherits the page font so buttons look consistent. */
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+
+/* Removes the bullet points (dots) from list elements. */
+ul{list-style:none}
+
+
+/* -------------------------------------------
+   CSS VARIABLES (Design Tokens)
+   Variables are reusable values â€” change one
+   variable and the change applies everywhere it is used.
+   They are defined inside :root which means "apply globally".
+------------------------------------------- */
+:root{
+  --bg-base: #000000;                    /* The main background color. Pure black. */
+  --bg-card: rgba(17, 24, 39, 0.7);     /* Card background â€” dark navy, 70% opaque (glassmorphism). */
+  --bg-card2: rgba(31, 41, 55, 0.4);    /* A slightly lighter card background variant, 40% opaque. */
+  --blue: #8b5cf6;                       /* The main accent color â€” a vibrant purple. */
+  --blue-light: #a78bfa;                 /* A lighter purple, used for hover states and highlights. */
+  --blue-dim: rgba(139, 92, 246, 0.15); /* The same purple at 15% opacity â€” used for subtle backgrounds. */
+  --blue-border: rgba(255, 255, 255, 0.1);       /* A very faint white border color. */
+  --blue-border-strong: rgba(139, 92, 246, 0.5); /* A stronger purple border for hover effects. */
+  --text-primary: #f9fafb;              /* Main text color â€” almost white. */
+  --text-muted: #9ca3af;               /* Secondary text â€” medium grey, for descriptions. */
+  --text-dim: #4b5563;                 /* Dimmed text â€” dark grey, for labels and minor info. */
+  --radius-sm: 8px;                    /* Small border-radius â€” slightly rounded corners. */
+  --radius-md: 12px;                   /* Medium border-radius â€” moderately rounded corners. */
+  --radius-lg: 16px;                   /* Large border-radius â€” very rounded corners. */
+  --transition: 0.3s ease;            /* Default animation speed for hover effects. 0.3 seconds, smooth ease. */
+  --font-display: 'Syne', sans-serif; /* Display/heading font loaded from Google Fonts. */
+}
+
+
+/* -------------------------------------------
+   BACKGROUND EFFECTS
+   Creates the subtle grid pattern layered over the dark background.
+------------------------------------------- */
+
+/* body::after creates an invisible layer on top of the background.
+   It does NOT contain any real content â€” it is purely decorative. */
+body::after{
+  content:'';            /* Required for ::after to show â€” it creates the pseudo-element. */
+  position:fixed;        /* Stays fixed on screen even when you scroll. */
+  inset:0;               /* Shorthand for top:0; right:0; bottom:0; left:0 â€” covers the entire screen. */
+
+  /* Two overlapping gradients that create a subtle dot/grid pattern:
+     First gradient: horizontal lines every 50px at 3% white opacity.
+     Second gradient (90deg): vertical lines every 50px at 3% white opacity. */
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);
+
+  background-size:50px 50px; /* Each grid cell is 50px x 50px. */
+  pointer-events:none;       /* Lets clicks pass through â€” this layer is invisible to the mouse. */
+  z-index:0;                 /* Sits behind all content (z-index controls front/back stacking order). */
+
+  /* Fades the grid out toward the edges so it only shows in the center.
+     black means visible, transparent means hidden. */
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%); /* Safari version. */
+}
+
+/* .orb is the glowing colored blob (ambient light effect). */
+.orb{
+  position:absolute;                             /* Positioned relative to its parent section. */
+  border-radius:50%;                             /* Makes it a perfect circle. */
+  filter:blur(100px);                            /* Blurs it heavily so it looks like a soft glow. */
+  pointer-events:none;                           /* Invisible to mouse clicks. */
+  animation: pulseOrb 8s ease-in-out infinite alternate; /* Plays the pulseOrb animation, back and forth, forever. */
+  mix-blend-mode: screen;                        /* Makes the orb blend with the background like a light source. */
+}
+
+/* The pulseOrb animation makes the orb slowly breathe â€” growing and drifting. */
+@keyframes pulseOrb {
+  0%   { transform: scale(1) translate(0, 0); opacity: 0.5; }          /* Start: normal size, 50% visible. */
+  100% { transform: scale(1.1) translate(20px, -20px); opacity: 0.8; } /* End: 10% bigger, shifted up-right, 80% visible. */
+}
+
+
+/* -------------------------------------------
+   TYPOGRAPHY HELPERS
+   Reusable classes for text styling.
+------------------------------------------- */
+
+/* Applies the display/heading font to any element that has this class. */
+.font-display{font-family:var(--font-display)}
+
+/* .gradient-text creates the animated rainbow gradient on text (like the name "Rakesh"). */
+.gradient-text{
+  /* Creates a diagonal gradient from blue to purple to pink and back to blue. */
+  background:linear-gradient(270deg, #60a5fa, #c084fc, #f472b6, #60a5fa);
+
+  background-size: 300% 300%; /* Makes the gradient 3x wider than needed so it can scroll/animate. */
+
+  /* These three properties together make the gradient visible ON the text itself (not behind it). */
+  -webkit-background-clip:text;      /* Clips the background to the shape of the text (Safari/Chrome). */
+  -webkit-text-fill-color:transparent; /* Makes the text transparent so the gradient shows through. */
+  background-clip:text;             /* Standard version of the same property. */
+
+  animation: gradientText 6s ease infinite; /* Animates the gradient position every 6 seconds, looping forever. */
+}
+
+/* gradientText moves the gradient background left and right to create the flowing color effect. */
+@keyframes gradientText {
+  0%   { background-position: 0% 50%; }   /* Gradient starts at the left. */
+  50%  { background-position: 100% 50%; } /* Gradient moves to the right. */
+  100% { background-position: 0% 50%; }   /* Returns to the left. */
+}
+
+
+/* -------------------------------------------
+   LAYOUT HELPERS
+   Reusable wrappers that keep content centered
+   and properly spaced on all screen sizes.
+------------------------------------------- */
+
+/* .container is the main content wrapper used in every section. */
+.container{
+  width:100%;          /* Takes up the full available width. */
+  max-width:1680px;    /* But never gets wider than 1680px, keeping content readable on large screens. */
+  margin-inline:auto;  /* Centers the container horizontally (margin-inline = left + right margins). */
+
+  /* clamp(min, preferred, max) â€” scales smoothly between the min and max.
+     At small screens: 1rem padding. At medium: 4% of viewport. At large: 5rem. */
+  padding-inline:clamp(1rem,4vw,5rem);
+}
+
+/* .section wraps each page section (Services, Projects, Skills, Contact). */
+.section{
+  width: 100%;    /* Stretches edge-to-edge. */
+  padding-block: clamp(4rem, 9vw, 7rem); /* Top and bottom padding that scales with screen size. */
+  position:relative; /* Allows child elements to use position:absolute relative to this section. */
+}
+
+
+/* -------------------------------------------
+   SECTION CHIP
+   The small pill-shaped label above section titles
+   (like "What I Do" or "Featured Work").
+------------------------------------------- */
+.chip{
+  display:inline-flex;         /* Lays out the icon and text side by side. */
+  align-items:center;          /* Vertically centers the icon and text. */
+  gap:6px;                     /* 6px space between the icon and the text. */
+  background:var(--blue-dim);  /* Faint purple background. */
+  border:1px solid var(--blue-border); /* Thin white border. */
+  color:var(--blue-light);     /* Light purple text. */
+  font-family:var(--font-display); /* Uses the heading font. */
+  font-weight:600;             /* Semi-bold text. */
+  font-size:0.7rem;            /* Small text (0.7 x 16px = 11.2px). */
+  letter-spacing:0.1em;        /* Spreads the letters apart slightly. */
+  text-transform:uppercase;    /* Converts all letters to capitals. */
+  padding:5px 14px;            /* 5px top/bottom, 14px left/right spacing inside the pill. */
+  border-radius:999px;         /* A very large radius = fully rounded pill shape. */
+  margin-bottom:1.25rem;       /* Space below the chip before the section title. */
+}
+
+
+/* -------------------------------------------
+   SECTION HEADER
+   The heading block at the top of each section,
+   containing the chip, title, and subtitle.
+------------------------------------------- */
+
+/* Centers the section heading block and adds space below it. */
+.section-header{
+  text-align:center;    /* Centers all text inside. */
+  margin-bottom:clamp(2.5rem,5vw,4rem); /* Responsive space below the header. */
+}
+
+/* The large section title text (like "Services Built for Real Results"). */
+.section-title{
+  font-family:var(--font-display); /* Heading font. */
+  font-weight:800;                 /* Extra bold. */
+  font-size:clamp(1.9rem,4vw,2.9rem); /* Scales with screen: min 1.9rem, max 2.9rem. */
+  color:#fff;                      /* Pure white text. */
+  line-height:1.15;                /* Tighter line spacing for large headings. */
+  margin-bottom:0.9rem;            /* Space between title and subtitle. */
+}
+
+/* The smaller paragraph under the section title. */
+.section-subtitle{
+  color:var(--text-muted); /* Grey text. */
+  font-size:clamp(0.9rem,2vw,1.05rem); /* Responsive font size. */
+  max-width:480px;         /* Keeps the subtitle narrow so it does not stretch too wide. */
+  margin-inline:auto;      /* Centers the subtitle block horizontally. */
+  line-height:1.7;         /* Comfortable line spacing for reading. */
+}
+
+
+/* -------------------------------------------
+   CARDS
+   The dark glass-like boxes used for Service,
+   Project, and Skill items.
+------------------------------------------- */
+
+/* The base card style. */
+.card{
+  /* A dark semi-transparent gradient background â€” creates the "glass" look. */
+  background:linear-gradient(145deg, rgba(30,41,59,0.5), rgba(15,23,42,0.5));
+
+  backdrop-filter: blur(12px);         /* Blurs whatever is behind the card â€” the glassmorphism effect. */
+  -webkit-backdrop-filter: blur(12px); /* Safari version of backdrop-filter. */
+
+  border:1px solid var(--blue-border); /* Thin, faint white border around the card. */
+  border-radius:var(--radius-lg);      /* Rounded corners (16px). */
+
+  /* How the card animates when you hover.
+     cubic-bezier is a custom speed curve â€” this one has a slight bounce at the end. */
+  transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* When the mouse hovers over a card. */
+.card:hover{
+  border-color:var(--blue-border-strong);         /* Border becomes brighter purple. */
+  transform:translateY(-10px) scale(1.02);        /* Card lifts up 10px and grows slightly. */
+  box-shadow:0 15px 40px -10px rgba(139, 92, 246, 0.3), /* Purple shadow underneath. */
+             inset 0 0 20px rgba(255,255,255,0.03); /* Very faint inner glow. */
+  z-index: 10; /* Brings the hovered card in front of others. */
+}
+
+/* .card-highlight adds a glowing top border line to featured cards. */
+.card-highlight{
+  position:relative; /* Needed so ::before can be positioned inside it. */
+  overflow:hidden;   /* Hides anything that goes outside the card boundary. */
+}
+
+/* Creates the glowing top border â€” it is not a real border but a pseudo-element. */
+.card-highlight::before{
+  content:'';              /* Required for pseudo-elements. Creates an empty element. */
+  position:absolute;       /* Positioned inside .card-highlight. */
+  top:0;left:0;right:0;   /* Stretches across the full top edge. */
+  height:2px;              /* Just 2px tall â€” a thin line. */
+  /* Gradient that goes from transparent to purple to light purple and back to transparent. */
+  background:linear-gradient(90deg, transparent, var(--blue), var(--blue-light), transparent);
+}
+
+
+/* -------------------------------------------
+   BUTTONS
+   Two button styles: primary (purple gradient)
+   and ghost (transparent with border).
+------------------------------------------- */
+
+/* Base styles shared by all buttons. */
+.btn{
+  display:inline-flex;      /* Aligns icon and text side by side. */
+  align-items:center;       /* Vertically centers the content. */
+  justify-content:center;   /* Horizontally centers the content. */
+  gap:8px;                  /* Space between icon and text. */
+  padding:0.8rem 1.6rem;    /* Top/bottom 0.8rem, left/right 1.6rem. */
+  border-radius:var(--radius-md); /* 12px rounded corners. */
+  font-family:var(--font-display); /* Heading font. */
+  font-weight:600;          /* Semi-bold. */
+  font-size:0.9rem;         /* Slightly smaller than body text. */
+  letter-spacing:0.02em;    /* Very slight letter spacing. */
+  transition:all var(--transition); /* Smooth animation for all hover effects. */
+  white-space:nowrap;       /* Prevents button text from wrapping to a new line. */
+}
+
+/* The filled purple gradient button (e.g., "Let's Build Together"). */
+.btn-primary{
+  background:linear-gradient(135deg, #4f46e5, #9333ea); /* Diagonal gradient from indigo to purple. */
+  border:1px solid rgba(255,255,255,0.15); /* Subtle white border. */
+  color:#fff;               /* White text. */
+  position:relative;        /* Needed for the ::after hover overlay to work. */
+  overflow:hidden;          /* Hides the ::after overlay until hover. */
+}
+
+/* Creates an invisible brighter gradient overlay inside the button for hover effect. */
+.btn-primary::after{
+  content:'';                                          /* Creates the pseudo-element. */
+  position:absolute;inset:0;                          /* Covers the entire button. */
+  z-index:0;                                           /* Keeps overlay below the text/icon. */
+  pointer-events:none;                                 /* Prevents overlay from blocking taps/clicks. */
+  background:linear-gradient(135deg, #6366f1, #a855f7); /* A lighter, brighter gradient. */
+  opacity:0;                                           /* Hidden by default. */
+  transition:opacity 0.4s ease;                       /* Fades in when hovered. */
+}
+
+/* On hover: the brighter overlay fades in. */
+.btn-primary:hover::after{opacity:1}
+
+/* On hover: button also gets a purple glow and lifts up slightly. */
+.btn-primary:hover{box-shadow:0 0 30px rgba(147, 51, 234, 0.5);transform:translateY(-4px) scale(1.02)}
+
+/* All direct children of .btn-primary appear above the ::after overlay layer. */
+.btn-primary>*{position:relative;z-index:1}
+.btn-primary span{position:relative;z-index:1;color:inherit}
+
+/* The transparent/outline button (e.g., "View My Work"). */
+.btn-ghost{
+  background:transparent;              /* No background fill. */
+  border:1px solid var(--blue-border); /* Thin faint border. */
+  color:var(--text-primary);           /* White text. */
+}
+
+/* On hover: the ghost button gains a faint purple tint. */
+.btn-ghost:hover{
+  border-color:var(--blue-border-strong); /* Border becomes brighter. */
+  background:var(--blue-dim);            /* Faint purple background appears. */
+  color:var(--blue-light);              /* Text becomes light purple. */
+}
+
+/* Small button variant â€” used inside cards. */
+.btn-sm{padding:0.55rem 1.1rem;font-size:0.8rem;border-radius:var(--radius-sm)}
+
+
+/* -------------------------------------------
+   NAVBAR
+   The fixed top navigation bar.
+------------------------------------------- */
+
+/* The navigation bar â€” always visible at the top of the screen. */
+#navbar{
+  position:fixed;          /* Stays at the top even when the user scrolls. */
+  top:0;left:0;right:0;   /* Stretches across the full width of the screen. */
+  z-index:100;             /* Sits in front of ALL other page content. */
+  background:rgba(3,7,18,0.7); /* Dark navy, 70% opaque. */
+  backdrop-filter:blur(20px);        /* Blurs the page content behind the navbar. */
+  -webkit-backdrop-filter:blur(20px); /* Safari version. */
+  border-bottom:1px solid rgba(255,255,255,0.05); /* Very faint bottom border line. */
+  transition:background var(--transition); /* Smooth background change when scrolling. */
+}
+
+/* When the user scrolls down, the navbar becomes more opaque (added by JavaScript). */
+#navbar.scrolled{background:rgba(3,7,18,0.95)}
+
+/* The inner row that holds the logo and nav links. */
+.nav-inner{
+  width:100%;             /* Full width. */
+  max-width:none;         /* No max-width limit. */
+  margin-inline:0;        /* No horizontal centering margin. */
+  padding-inline:clamp(1rem,4vw,5rem); /* Responsive horizontal padding. */
+  height:64px;            /* Fixed 64px tall. */
+  display:flex;           /* Puts logo and links side by side. */
+  align-items:center;     /* Vertically centers the logo and links. */
+  justify-content:space-between; /* Logo on the left, links on the right. */
+}
+
+/* The brand name in the top-left corner. */
+.nav-logo{
+  font-family:var(--font-display); /* Heading font. */
+  font-weight:800;        /* Extra bold. */
+  font-size:1.2rem;       /* Slightly larger than body text. */
+  color:#fff;             /* White. */
+  letter-spacing:-0.02em; /* Slightly tighter letter spacing. */
+}
+
+/* A second color applied to a <span> inside the logo. */
+.nav-logo span{color:#4a5568}
+
+/* The row of navigation links on the right. */
+.nav-links{
+  display:flex;           /* Side by side. */
+  align-items:center;     /* Vertically centered. */
+  gap:2rem;               /* 2rem space between each link. */
+}
+
+/* Individual navigation links. */
+.nav-links a{
+  color:var(--text-muted); /* Grey by default. */
+  font-size:0.9rem;        /* Slightly smaller than body. */
+  font-weight:500;         /* Medium weight. */
+  transition:color var(--transition); /* Smooth color change on hover. */
+}
+
+/* Link turns light purple when hovered. */
+.nav-links a:hover{color:var(--blue-light)}
+
+/* The "Let's Talk" button in the navbar â€” slightly smaller than standard buttons. */
+.nav-cta{padding:0.5rem 1.2rem;font-size:0.85rem}
+
+
+/* Hamburger menu button â€” only visible on mobile screens. */
+#menu-btn{
+  display:none;           /* Hidden by default (shown on mobile via media query). */
+  flex-direction:column;  /* Three bars stacked vertically. */
+  gap:5px;                /* Space between each bar. */
+  padding:6px;            /* Clickable area padding. */
+  background:none;        /* No background. */
+  border:none;            /* No border. */
+}
+
+/* Each bar of the hamburger icon. */
+#menu-btn span{
+  display:block;          /* Each bar is a block element. */
+  width:22px;height:2px;  /* 22px wide, 2px tall â€” a thin line. */
+  background:var(--text-muted); /* Grey colored bars. */
+  border-radius:2px;      /* Slightly rounded ends. */
+  transition:all 0.3s ease; /* Smooth animation when transforming to X. */
+  transform-origin:center;  /* Rotates from the center of each bar. */
+}
+
+/* When the menu is open, the first bar rotates down to form the top of an X. */
+#menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+
+/* The middle bar fades and shrinks away. */
+#menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+
+/* The third bar rotates up to form the bottom of an X. */
+#menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+
+/* The dropdown mobile navigation menu. */
+#mobile-nav{
+  display:none;           /* Hidden by default. */
+  flex-direction:column;  /* Links stacked vertically. */
+  gap:0;                  /* No extra space between links (each link has its own padding). */
+  border-top:1px solid rgba(255,255,255,0.05); /* Faint separator above the menu. */
+  padding:1rem clamp(1rem,5vw,2.5rem) 1.25rem; /* Inner spacing. */
+  background:rgba(3,7,18,0.97); /* Almost fully opaque dark background. */
+}
+
+/* When JavaScript adds the "open" class, the menu becomes visible. */
+#mobile-nav.open{display:flex}
+
+/* Individual links inside the mobile menu. */
+#mobile-nav a{
+  color:var(--text-muted); /* Grey text. */
+  font-size:0.95rem;       /* Comfortable reading size. */
+  font-weight:500;         /* Medium weight. */
+  padding:0.6rem 0;        /* Top/bottom padding for easy tapping. */
+  border-bottom:1px solid rgba(255,255,255,0.04); /* Very faint separator between links. */
+  transition:color var(--transition); /* Smooth color change on hover. */
+}
+
+/* The last link has no bottom border, and gets a small top margin. */
+#mobile-nav a:last-child{border-bottom:none;margin-top:0.5rem}
+
+/* Links turn light purple on hover. */
+#mobile-nav a:hover{color:var(--blue-light)}
+
+
+/* -------------------------------------------
+   HERO SECTION â€” Centered Cinematic Layout
+   The full-screen opening section with the
+   headline, 3D cube, and stats bar.
+------------------------------------------- */
+
+/* The hero section fills the full screen height. */
+
+.hero-layout{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) minmax(360px, 0.9fr);
+  align-items:center;
+  gap:clamp(2rem,5vw,5rem);
+  width:100%;
+}
+#hero{
+  min-height:100svh;       /* svh = "small viewport height" â€” reliable on mobile browsers too. */
+  display:flex;            /* Stacks children (headline, scene, stats) vertically. */
+  flex-direction:column;   /* Top to bottom layout. */
+  align-items:center;      /* Centers everything horizontally. */
+  justify-content:center;  /* Centers everything vertically. */
+  padding-top:64px;        /* Pushes content below the fixed navbar (which is 64px tall). */
+  padding-bottom:0;        /* No bottom padding. */
+  position:relative;       /* Allows the ambient orbs to be positioned inside. */
+  overflow:hidden;         /* Hides the orbs that extend outside the section boundary. */
+}
+
+/* The block containing the status badge, headline, subtitle, and buttons. */
+.hero-top{
+  position:relative;       /* Allows z-index to work. */
+  z-index:2;               /* Sits in front of the 3D scene and orbs. */
+  display:flex;            /* Stacks children vertically. */
+  flex-direction:column;   /* Top to bottom. */
+  align-items:center;      /* Centers everything horizontally. */
+  text-align:center;       /* Centers all text. */
+  padding-top:clamp(2rem,4vw,3.5rem); /* Responsive space at the top. */
+}
+
+/* The "Available for Freelance" green pill badge. */
+.hero-status{
+  display:inline-flex;     /* Shows icon and text side by side. */
+  align-items:center;      /* Vertically centered. */
+  gap:8px;                 /* Space between the dot and the text. */
+  background:rgba(74,222,128,0.07); /* Very faint green background. */
+  border:1px solid rgba(74,222,128,0.2); /* Faint green border. */
+  color:#86efac;           /* Light green text. */
+  font-family:var(--font-display); /* Heading font. */
+  font-size:0.7rem;        /* Small text. */
+  font-weight:600;         /* Semi-bold. */
+  letter-spacing:0.08em;  /* Spread-out letters. */
+  text-transform:uppercase; /* All caps. */
+  padding:5px 14px;        /* Inner spacing. */
+  border-radius:999px;     /* Pill shape. */
+  margin-bottom:1.5rem;    /* Space below the badge before the headline. */
+}
+
+/* The small pulsing green dot inside the status badge. */
+.status-dot{
+  width:7px;height:7px;   /* 7x7 pixel circle. */
+  background:#4ade80;      /* Bright green. */
+  border-radius:50%;       /* Perfect circle. */
+  animation:pulse-green 2s ease-in-out infinite; /* Pulses every 2 seconds, forever. */
+}
+
+/* The pulse-green animation fades the dot and adds a growing ring around it. */
+@keyframes pulse-green{
+  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(74,222,128,0.4)}  /* Fully visible, no ring. */
+  50%    {opacity:0.6;box-shadow:0 0 0 5px rgba(74,222,128,0)} /* Dimmer, ring expanded and faded. */
+}
+
+/* The main headline: "Building Interfaces That Convert". */
+.hero-title{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:clamp(2.8rem,5vw,5rem);
+  line-height:1.02;
+  color:#fff;
+  margin-bottom:1.25rem;
+  letter-spacing:0;
+}
+
+/* Each line of the headline is wrapped in a <span class="line"> â€” this makes them block-level. */
+.hero-title .line{display:block}
+
+/* The "Code That Scales." line uses an outline text effect. */
+.hero-title .muted{
+  color:transparent;       /* Text fill is invisible. */
+  -webkit-text-stroke:1.5px rgba(255,255,255,0.15); /* Only the outline is visible â€” very faint white. */
+}
+
+/* The subtitle paragraph under the headline. */
+.hero-sub{
+  color:var(--text-muted);
+  font-size:clamp(0.95rem,1.5vw,1.1rem);
+  line-height:1.75;
+  max-width:560px;
+  margin-bottom:2.25rem;
+}
+
+/* The row containing the two CTA buttons. */
+.hero-cta-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  gap:0.875rem;
+  margin-bottom:0;
+}
+
+
+/* The container for the 3D cube, rings, and floating tech tags. */
+.hero-scene{
+  width:100%;
+  min-height:430px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* The soft purple/blue glow behind the cube. */
+.hero-glow{
+  position:absolute;       /* Centered inside the scene. */
+  width:300px;height:300px; /* 300x300 circle. */
+  border-radius:50%;       /* Perfect circle. */
+  /* Radial gradient: bright purple center, fading to blue, then transparent. */
+  background:radial-gradient(circle,rgba(139,92,246,0.25) 0%,rgba(59,130,246,0.1) 50%,transparent 70%);
+  filter:blur(28px);       /* Heavy blur makes it look like a glow. */
+  pointer-events:none;     /* Invisible to mouse clicks. */
+  animation:glowPulse 5s ease-in-out infinite alternate; /* Slowly breathes in and out. */
+}
+
+/* The glow pulses by growing and brightening. */
+@keyframes glowPulse{
+  from{transform:scale(1);opacity:0.7}    /* Normal size, 70% opacity. */
+  to  {transform:scale(1.18);opacity:1}  /* 18% bigger, fully visible. */
+}
+
+
+/* Base style for the three rotating rings around the cube. */
+.ring{
+  position:absolute;   /* Centered on the cube. */
+  border-radius:50%;   /* Perfect circle. */
+  pointer-events:none; /* Does not block mouse events. */
+}
+
+/* The largest ring (outermost). Purple dashed border, slow 30-second rotation. */
+.ring-1{width:460px;height:460px;border:1px dashed rgba(139,92,246,0.14);animation:spin 30s linear infinite}
+
+/* The medium ring. Blue dashed border, 20-second rotation in reverse (counter-clockwise). */
+.ring-2{width:310px;height:310px;border:1px dashed rgba(96,165,250,0.11);animation:spin 20s linear infinite reverse}
+
+/* The smallest inner ring. Pink dashed border, fastest at 14 seconds. */
+.ring-3{width:175px;height:175px;border:1px dashed rgba(244,114,182,0.09);animation:spin 14s linear infinite}
+
+/* The spin animation simply rotates from 0 degrees to a full 360-degree circle. */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+
+/* The perspective wrapper gives the cube its 3D depth.
+   A larger perspective value makes the 3D effect look more distant (less extreme). */
+.cube-wrap{perspective:900px}
+
+/* The 3D cube itself. */
+.cube{
+  width:110px;height:110px;  /* 110 x 110 pixels. */
+  position:relative;         /* Needed for the faces to be positioned inside. */
+  transform-style:preserve-3d; /* Tells the browser to render children in 3D space. */
+
+  /* CSS custom properties --cube-x and --cube-y are set by JavaScript on mouse move.
+     The fallback values are -15deg and 28deg so it looks good without interaction. */
+  transform:rotateX(var(--cube-x,-15deg)) rotateY(var(--cube-y,28deg));
+
+  transition:transform 160ms ease-out; /* Smooth 160ms rotation when the mouse moves. */
+  will-change:transform;    /* Tells the browser to prepare for frequent transform changes (performance hint). */
+}
+
+/* Each of the six square faces of the cube. */
+.face{
+  position:absolute;         /* All six faces stack in the same 3D space. */
+  width:110px;height:110px;  /* Same size as the cube. */
+  border:1px solid rgba(139,92,246,0.5); /* Purple border on each face. */
+  /* Very subtle purple-to-blue gradient background. */
+  background:linear-gradient(135deg,rgba(139,92,246,0.05),rgba(59,130,246,0.07));
+}
+
+/* translateZ moves a face forward or backward along the Z axis (depth).
+   55px = half the cube's width (half of 110px), placing each face at the cube's edge. */
+.face.front {transform:translateZ(55px)}              /* Pushed toward the viewer. */
+.face.back  {transform:rotateY(180deg) translateZ(55px)} /* Flipped and pushed away. */
+.face.left  {transform:rotateY(-90deg) translateZ(55px)} /* Rotated left 90 degrees. */
+.face.right {transform:rotateY(90deg) translateZ(55px)}  /* Rotated right 90 degrees. */
+.face.top   {transform:rotateX(90deg) translateZ(55px)}  /* Rotated up 90 degrees. */
+.face.bottom{transform:rotateX(-90deg) translateZ(55px)} /* Rotated down 90 degrees. */
+
+
+/* The floating tech label pills (React, Node.js, Tailwind etc.) around the cube. */
+.float-tag{
+  position:absolute;        /* Positioned inside .hero-scene. */
+  display:inline-flex;      /* Icon dot and text side by side. */
+  align-items:center;       /* Vertically centered. */
+  gap:6px;                  /* Space between the color dot and text. */
+  background:rgba(5,10,24,0.88); /* Very dark, nearly opaque background. */
+  border:1px solid rgba(139,92,246,0.3); /* Faint purple border. */
+  color:#c4b5fd;            /* Light purple text. */
+  font-family:var(--font-display); /* Heading font. */
+  font-size:0.7rem;         /* Small text. */
+  font-weight:600;          /* Semi-bold. */
+  letter-spacing:0.05em;   /* Slightly spread letters. */
+  padding:6px 14px;         /* Inner spacing. */
+  border-radius:999px;      /* Pill shape. */
+  backdrop-filter:blur(14px); /* Blurs what is behind the tag. */
+  white-space:nowrap;       /* Never wraps text to a second line. */
+  box-shadow:0 4px 18px rgba(139,92,246,0.12); /* Soft purple shadow below. */
+}
+
+/* The small colored circle inside each tech tag (brand color indicator). */
+.float-tag .ft-dot{
+  width:6px;height:6px;  /* 6x6 pixel circle. */
+  border-radius:50%;      /* Perfect circle. */
+  flex-shrink:0;          /* Never shrinks even if space is tight. */
+}
+
+/*
+  floatYC â€” used by tags that are centered with left:50% (ft1 and ft6).
+  The animation MUST include translateX(-50%) in every frame, otherwise the
+  centering transform gets overwritten and the tag jumps out of position.
+*/
+@keyframes floatYC{
+  0%,100%{transform:translateX(-50%) translateY(0px)}   /* Centered horizontally, at rest. */
+  50%    {transform:translateX(-50%) translateY(-12px)}  /* Centered horizontally, 12px higher. */
+}
+
+/*
+  floatYS â€” used by side tags (ft2, ft3, ft4, ft5) that are positioned with left or right px values.
+  These only animate vertically â€” no horizontal transform needed.
+*/
+@keyframes floatYS{
+  0%,100%{transform:translateY(0px)}   /* At rest. */
+  50%    {transform:translateY(-10px)} /* 10px higher. */
+}
+
+/* Clock-face positions for each floating tech tag around the cube scene. */
+
+/* ft1 â€” React tag at the 12 o'clock position (top center). */
+.ft1{
+  top:2%;       /* Near the top of the scene. */
+  left:50%;     /* Start at the horizontal center. */
+  transform:translateX(-50%); /* Shift left by half its own width to truly center it. */
+  animation:floatYC 7s ease-in-out infinite; /* Floats up and down every 7 seconds. */
+}
+
+/* ft2 â€” Node.js tag at the 9 o'clock position (left middle). */
+.ft2{
+  top:calc(50% - 14px); /* Vertically centered (50% minus half the tag's height ~14px). */
+  left:2%;               /* Near the left edge of the scene. */
+  animation:floatYS 9s ease-in-out infinite 1.4s; /* Floats every 9s, starts after a 1.4s delay. */
+}
+
+/* ft3 â€” Tailwind tag at the 3 o'clock position (right middle). */
+.ft3{
+  top:calc(50% - 14px); /* Vertically centered. */
+  right:2%;              /* Near the right edge. */
+  animation:floatYS 6.5s ease-in-out infinite 0.7s; /* Floats every 6.5s, 0.7s delay. */
+}
+
+/* ft4 â€” TypeScript tag at the 7-8 o'clock position (lower left). */
+.ft4{
+  bottom:14%; left:8%;   /* Lower-left area. */
+  animation:floatYS 8s ease-in-out infinite 2.3s; /* Floats every 8s, 2.3s delay. */
+}
+
+/* ft5 â€” Next.js tag at the 4-5 o'clock position (lower right). */
+.ft5{
+  bottom:14%; right:8%;  /* Lower-right area. */
+  animation:floatYS 7s ease-in-out infinite 0.9s; /* Floats every 7s, 0.9s delay. */
+}
+
+/* ft6 â€” JavaScript tag at the 6 o'clock position (bottom center). */
+.ft6{
+  bottom:2%; left:50%;  /* Near the bottom, starting at center. */
+  transform:translateX(-50%); /* Shift left to truly center it. */
+  animation:floatYC 10s ease-in-out infinite 3s; /* Floats every 10s, starts after 3s delay. */
+}
+
+
+/* The "3+ Live Projects / 9+ Tech Stack / 100% Dedication" bar below the scene. */
+.hero-stats-bar{
+  position:relative;      /* Stacking context for the dividers between stats. */
+  z-index:2;              /* Sits above the 3D scene. */
+  display:flex;           /* Three stat items side by side. */
+  flex-direction:row;     /* Horizontal layout. */
+  align-items:stretch;    /* Each item stretches to the same height. */
+  width:min(580px,88vw); /* At most 580px, but 88% of viewport on small screens. */
+  margin-top:clamp(0.5rem,1.5vw,1rem);   /* Responsive space above the bar. */
+  margin-bottom:clamp(1.5rem,3vw,2.5rem); /* Responsive space below. */
+  background:rgba(255,255,255,0.03); /* Very faint white background. */
+  border:1px solid rgba(255,255,255,0.08); /* Faint white border. */
+  border-radius:var(--radius-lg); /* 16px rounded corners. */
+  backdrop-filter:blur(14px); /* Glassmorphism blur. */
+  overflow:hidden;        /* Clips content to the rounded corners. */
+}
+
+/* Each individual stat (number + label). */
+.stat-item{
+  flex:1;                 /* Each item takes equal width. */
+  display:flex;           /* Stack number and label vertically. */
+  flex-direction:column;  /* Number on top, label below. */
+  align-items:center;     /* Centered horizontally. */
+  justify-content:center; /* Centered vertically. */
+  padding:1.1rem 0.75rem; /* Inner spacing. */
+  position:relative;      /* Needed for the ::before divider line. */
+}
+
+/* Creates the vertical divider line between each stat item.
+   Only applies when a .stat-item follows another .stat-item (the + selector). */
+.stat-item+.stat-item::before{
+  content:'';             /* Creates an empty pseudo-element. */
+  position:absolute;      /* Positioned inside the stat item. */
+  left:0;top:18%;bottom:18%; /* Runs from 18% to 82% of the item height (not full height). */
+  width:1px;              /* 1px wide â€” a thin line. */
+  background:rgba(255,255,255,0.07); /* Very faint white. */
+}
+
+/* The big number (3+, 9+, 100%). */
+.stat-num{
+  font-family:var(--font-display); /* Heading font. */
+  font-weight:800;        /* Extra bold. */
+  font-size:1.65rem;      /* Large number. */
+  line-height:1;          /* No extra line spacing. */
+  margin-bottom:4px;      /* Small gap between number and label. */
+
+  /* Gradient text: white to light purple. */
+  background:linear-gradient(135deg,#fff,#c4b5fd);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* The small label below each number ("Live Projects", "Tech Stack", "Dedication"). */
+.stat-label{
+  font-size:0.62rem;       /* Very small text. */
+  text-transform:uppercase; /* All capitals. */
+  letter-spacing:0.12em;  /* Wide letter spacing for the uppercase label. */
+  color:var(--text-dim);  /* Dim grey. */
+}
+
+/* Hides the old divider elements (replaced by the ::before pseudo-element approach). */
+.stat-divider{display:none}
+
+
+/* -------------------------------------------
+   SERVICES SECTION
+   The three service cards (Frontend, Full-Stack, Mobile).
+------------------------------------------- */
+
+/* Three-column grid for the service cards. */
+.services-grid{
+  display:grid;                          /* Grid layout. */
+  grid-template-columns:repeat(3,1fr);   /* Three equal columns. */
+  gap:1.25rem;                           /* Space between cards. */
+}
+
+/* Inner padding for each service card. */
+.service-card{
+  /* clamp scales padding between 1.5rem and 2rem based on viewport. */
+  padding:clamp(1.5rem,3vw,2rem);
+}
+
+/* The icon box at the top of each service card. */
+.service-icon{
+  width:52px;height:52px;          /* 52x52 square. */
+  border-radius:12px;              /* Rounded corners. */
+  background:var(--blue-dim);      /* Faint purple fill. */
+  border:1px solid var(--blue-border); /* Faint border. */
+  display:flex;                    /* Centers the SVG icon. */
+  align-items:center;              /* Vertically centered. */
+  justify-content:center;          /* Horizontally centered. */
+  margin-bottom:1.25rem;           /* Space below the icon. */
+  color:var(--blue-light);         /* Light purple icon color. */
+}
+
+/* The service name ("Premium Frontend Engineering" etc.). */
+.service-title{
+  font-family:var(--font-display); /* Heading font. */
+  font-weight:700;                 /* Bold. */
+  font-size:1.1rem;                /* Slightly large. */
+  color:#fff;                      /* White. */
+  margin-bottom:0.6rem;            /* Space below the title. */
+  line-height:1.3;                 /* Slightly tighter line spacing. */
+}
+
+/* The description paragraph under the service title. */
+.service-desc{
+  color:var(--text-muted); /* Grey text. */
+  font-size:0.88rem;       /* Slightly smaller. */
+  line-height:1.75;        /* Comfortable reading spacing. */
+  margin-bottom:1.25rem;   /* Space below before the bullet list. */
+}
+
+/* The list of bullet points inside each service card. */
+.service-list{display:flex;flex-direction:column;gap:6px} /* Vertical list with 6px gaps. */
+
+/* Each bullet point item. */
+.service-list li{
+  display:flex;align-items:center;gap:7px; /* Icon and text side by side. */
+  font-size:0.8rem;color:#64748b;          /* Small, muted text. */
+}
+
+/* The checkmark icon color inside each list item. */
+.check{color:var(--blue-light)}
+
+
+/* -------------------------------------------
+   PROJECTS SECTION
+   The three project cards.
+------------------------------------------- */
+
+/* Three-column grid for project cards. */
+.projects-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr); /* Three equal columns. */
+  gap:1.25rem;                          /* Gap between cards. */
+}
+
+/* Project cards have no padding â€” the thumbnail image goes edge-to-edge. */
+.project-card{overflow:hidden;padding:0}
+
+/* The top image/preview area of each project card. */
+.project-thumb{
+  height:170px;                     /* Fixed 170px tall preview area. */
+  display:flex;align-items:center;justify-content:center; /* Centers the icon inside. */
+  position:relative;                /* Needed for the badge positioning. */
+  border-bottom:1px solid var(--blue-border); /* Separator between preview and body. */
+}
+
+/* The icon and label inside the preview area. */
+.thumb-icon{
+  display:flex;
+  flex-direction:column; /* Icon on top, label below. */
+  align-items:center;    /* Centered. */
+  gap:8px;               /* Space between icon and label. */
+  position:relative;z-index:1; /* Above any background effects. */
+}
+
+/* The color of SVG icons inside .thumb-icon. */
+.thumb-icon svg{color:#60a5fa;opacity:0.7}
+
+/* The project name text inside the preview area. */
+.thumb-label{
+  font-family:var(--font-display);
+  font-size:0.7rem;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+
+/* The green "Live" badge in the top-right of live project cards. */
+.live-badge{
+  position:absolute;top:10px;right:10px; /* Top-right corner of the preview area. */
+  background:rgba(74,222,128,0.1);       /* Faint green background. */
+  border:1px solid rgba(74,222,128,0.25); /* Green border. */
+  color:#86efac;                         /* Light green text. */
+  font-size:0.65rem;font-weight:600;     /* Very small, bold text. */
+  padding:3px 9px;border-radius:999px;  /* Pill shape. */
+  font-family:var(--font-display);
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+
+/* The blue "Mobile App" badge for the Android project. */
+.mobile-badge{
+  position:absolute;top:10px;right:10px;
+  background:rgba(125,211,252,0.1);      /* Faint blue background. */
+  border:1px solid rgba(125,211,252,0.25);
+  color:#7dd3fc;                         /* Light blue text. */
+  font-size:0.65rem;font-weight:600;
+  padding:3px 9px;border-radius:999px;
+  font-family:var(--font-display);
+  letter-spacing:0.06em;text-transform:uppercase;
+}
+
+/* The text body area below the project preview. */
+.project-body{padding:1.5rem}
+
+/* The project name text. */
+.project-title{
+  font-family:var(--font-display);
+  font-weight:700;font-size:1.05rem;color:#fff;
+  margin-bottom:0.5rem;
+}
+
+/* The project description paragraph. */
+.project-desc{
+  color:var(--text-muted);
+  font-size:0.85rem;line-height:1.7;
+  margin-bottom:1rem;
+}
+
+/* The row of technology pills (HTML5, CSS3, etc.). */
+.tech-row{
+  display:flex;flex-wrap:wrap;gap:6px; /* Side by side, wraps to new line if needed. */
+  margin-bottom:1.25rem;
+}
+
+/* Each technology pill tag. */
+.tech-pill{
+  background:rgba(15,26,46,0.9);              /* Very dark blue background. */
+  border:1px solid rgba(96,165,250,0.15);     /* Faint blue border. */
+  color:#7dd3fc;                              /* Light blue text. */
+  font-size:0.68rem;font-weight:500;
+  letter-spacing:0.04em;
+  padding:3px 10px;
+  border-radius:999px;                        /* Pill shape. */
+}
+
+
+/* -------------------------------------------
+   SKILLS SECTION
+   The three skill group cards (Frontend,
+   Backend, Tools).
+------------------------------------------- */
+
+/* The grid that holds the three skill cards. */
+.skills-stack {
+  display: grid;
+  /* auto-fit: fills as many columns as fit. minmax(300px, 1fr): each column is at least 300px.
+     On desktop: 3 columns. On tablet: 2. On mobile: 1. No media query needed. */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem; /* Space between cards. */
+}
+
+/* Each skill group card. */
+.skill-group{
+  padding: 2rem 1.75rem;  /* Generous inner spacing. */
+  display: flex;          /* Stack label and badges vertically. */
+  flex-direction: column; /* Top to bottom. */
+}
+
+/* The category label ("Frontend", "Backend & Languages", "Tools & Platforms"). */
+.skill-group-label{
+  font-family:var(--font-display);
+  font-size:0.75rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  color:var(--blue-light);  /* Light purple. */
+  margin-bottom:1.25rem;    /* Space below before the badges. */
+  display: flex;            /* Aligns the dot and text. */
+  align-items: center;
+  gap: 8px;                 /* Space between the dot and the label text. */
+}
+
+/* The glowing purple dot before each skill group label. */
+.skill-group-label::before {
+  content: '';              /* Creates the dot. */
+  display: inline-block;
+  width: 6px;               /* 6x6 pixel circle. */
+  height: 6px;
+  background: var(--blue-light);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--blue-light); /* Glow effect around the dot. */
+}
+
+/* The wrapping row of technology badge chips. */
+.badges{display:flex;flex-wrap:wrap;gap:0.75rem}
+
+/* Each individual technology badge (HTML5, React, Python, etc.). */
+.badge{
+  display:inline-flex;      /* Icon and text side by side. */
+  align-items:center;       /* Vertically centered. */
+  gap:8px;                  /* Space between icon and text. */
+  background:rgba(255, 255, 255, 0.03); /* Very faint white background. */
+  border:1px solid var(--blue-border);  /* Faint border. */
+  color:var(--text-primary);           /* White text. */
+  font-family:var(--font-display);
+  font-weight:500;
+  font-size:0.85rem;
+  padding:8px 16px;
+  border-radius:var(--radius-lg);      /* Rounded corners. */
+  backdrop-filter: blur(10px);         /* Glassmorphism. */
+  -webkit-backdrop-filter: blur(10px);
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth hover animation. */
+}
+
+/* When you hover a badge, it lifts and glows purple. */
+.badge:hover{
+  background:rgba(139, 92, 246, 0.15); /* Purple tint appears. */
+  border-color:var(--blue-border-strong); /* Stronger purple border. */
+  color:#fff;                          /* Text becomes white. */
+  transform:translateY(-3px) scale(1.05); /* Lifts up 3px and grows 5%. */
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2); /* Purple glow below. */
+}
+
+/* The icon color inside each badge. */
+.badge svg{
+  color: var(--blue-light); /* Light purple icon. */
+  flex-shrink:0;            /* Icon never shrinks. */
+}
+
+
+/* -------------------------------------------
+   CONTACT SECTION
+   The contact form and social links.
+------------------------------------------- */
+
+/* Hides overflow on the contact section (the background orb is very large). */
+#contact{overflow:hidden}
+
+/* The row of social links and the status indicator. */
+.contact-meta{
+  display:flex;
+  flex-wrap:wrap;          /* Wraps to next line on small screens. */
+  align-items:center;
+  justify-content:center;
+  gap:1.5rem;              /* Space between each link. */
+  margin-top:1.25rem;      /* Space above. */
+}
+
+/* Each link and the status span in .contact-meta. */
+.contact-meta a,.contact-meta span{
+  display:flex;
+  align-items:center;
+  gap:7px;                 /* Space between icon and text. */
+  font-size:0.88rem;
+  color:var(--text-muted);
+  transition:color var(--transition);
+}
+
+/* Links become light purple on hover. */
+.contact-meta a:hover{color:var(--blue-light)}
+
+/* Centers the contact card and limits its width. */
+.contact-wrap{
+  max-width:700px;         /* Card is never wider than 700px. */
+  margin-inline:auto;      /* Centered horizontally. */
+}
+
+/* Padding inside the contact card. */
+.contact-card{padding:clamp(1.75rem,4vw,2.75rem)}
+
+/* The two-column row for Name and Email inputs. */
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr; /* Two equal-width columns. */
+  gap:1rem;                      /* Space between them. */
+  margin-bottom:1rem;
+}
+
+/* Each label + input pair. */
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+
+/* The last form group has extra bottom margin. */
+.form-group:last-of-type{margin-bottom:1.25rem}
+
+/* Form field labels. */
+label{
+  font-family:var(--font-display);
+  font-size:0.68rem;       /* Very small. */
+  font-weight:700;         /* Bold. */
+  text-transform:uppercase; /* All caps. */
+  letter-spacing:0.1em;   /* Wide spacing. */
+  color:var(--text-muted); /* Grey. */
+}
+
+/* Styles shared by all form inputs: text input, select dropdown, and textarea. */
+input,select,textarea{
+  background:rgba(255,255,255,0.03); /* Very faint background. */
+  border:1px solid var(--blue-border); /* Faint border. */
+  border-radius:var(--radius-sm);    /* 8px rounded corners. */
+  color:var(--text-primary);         /* White text typed by user. */
+  font-family:'DM Sans',sans-serif;  /* Body font. */
+  font-size:0.9rem;
+  padding:0.8rem 1rem;               /* Inner spacing. */
+  transition:border-color var(--transition),box-shadow var(--transition); /* Smooth focus animation. */
+  width:100%;                        /* Always fills its container fully. */
+  -webkit-appearance:none;           /* Removes iOS default styling. */
+  appearance:none;                   /* Removes browser default styling. */
+}
+
+/* Placeholder text is grey and slightly transparent. */
+input::placeholder,textarea::placeholder{color:rgba(148,163,184,0.45)}
+
+/* When a field is focused (clicked), the border turns blue and a glow ring appears. */
+input:focus,select:focus,textarea:focus{
+  outline:none;                             /* Removes the browser's default blue outline. */
+  border-color:rgba(96,165,250,0.5);       /* Blue border. */
+  box-shadow:0 0 0 3px rgba(59,130,246,0.1); /* Soft blue glow ring around the field. */
+}
+
+/* Adds a custom down-arrow icon to the select dropdown using an inline SVG encoded as a URL. */
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:2.5rem}
+
+/* Styles the options inside the dropdown. */
+select option{background:#0d1628;color:var(--text-primary)}
+
+/* The message textarea can be resized vertically only, and has a minimum height. */
+textarea{resize:vertical;min-height:130px;line-height:1.6}
+
+/* The "Send Message" submit button â€” full width version. */
+.btn-submit{
+  width:100%;              /* Fills the full card width. */
+  padding:1rem;            /* Comfortable click area. */
+  font-size:0.95rem;
+  border-radius:var(--radius-md);
+  margin-top:0.25rem;
+}
+
+/* The green success message shown after sending. */
+#form-success{
+  display:none;            /* Hidden by default. */
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#4ade80;           /* Bright green. */
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:0.9rem;
+  padding:0.75rem;
+  text-align:center;
+  margin-top:0.75rem;
+}
+
+/* When JavaScript adds class "show", the success message becomes visible. */
+#form-success.show{display:flex}
+
+
+/* -------------------------------------------
+   FOOTER
+   The bottom section with logo, copyright,
+   and social links.
+------------------------------------------- */
+
+/* The footer has a top border and vertical padding. */
+footer{
+  border-top:1px solid rgba(255,255,255,0.05); /* Faint separator line above the footer. */
+  padding:2rem 0;          /* 2rem top and bottom, no left/right (inner padding comes from .footer-inner). */
+}
+
+/* The inner row of the footer. */
+.footer-inner{
+  width:100%;
+  max-width:none;
+  margin-inline:0;
+  padding-inline:clamp(1rem,4vw,5rem); /* Matches the navbar horizontal padding. */
+  display:flex;
+  flex-wrap:wrap;          /* Wraps to next line on small screens. */
+  align-items:center;
+  justify-content:space-between; /* Logo left, copyright center, links right. */
+  gap:1rem;
+}
+
+/* The "Rakesh" brand name in the footer. */
+.footer-logo{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:1.1rem;
+  color:#fff;
+}
+
+/* The small copyright text. */
+.footer-copy{font-size:0.82rem;color:var(--text-dim)}
+
+/* Footer social links (Email, LinkedIn, Instagram, GitHub). */
+.footer-link{
+  display:flex;align-items:center;gap:6px; /* Icon and text side by side. */
+  font-size:0.82rem;color:var(--text-dim); /* Dim grey. */
+  transition:color var(--transition);       /* Smooth color on hover. */
+}
+
+/* Footer links turn light purple on hover. */
+.footer-link:hover{color:var(--blue-light)}
+
+
+/* -------------------------------------------
+   SCROLL REVEAL ANIMATION
+   Elements with class "reveal" start invisible
+   and slide up into view when scrolled to.
+   JavaScript adds the class "visible" which
+   triggers this animation.
+------------------------------------------- */
+
+/* Initial hidden state: invisible and shifted 26px down. */
+.reveal{
+  opacity:0;               /* Fully invisible. */
+  transform:translateY(26px); /* Shifted 26px downward. */
+  transition:opacity 0.65s ease,transform 0.65s ease; /* Animates over 0.65 seconds. */
+}
+
+/* Staggered animation delays so elements appear one after another. */
+.reveal.d1{transition-delay:0.08s}  /* Appears 0.08s after becoming visible. */
+.reveal.d2{transition-delay:0.16s}  /* Appears 0.16s after becoming visible. */
+.reveal.d3{transition-delay:0.24s}  /* Appears 0.24s after becoming visible. */
+
+/* When JavaScript adds "visible", the element fades in and moves to its normal position. */
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+
+/* -------------------------------------------
+   PARTICLES
+   The tiny floating dots in the hero background.
+   They are created and positioned by JavaScript.
+------------------------------------------- */
+
+/* Each particle dot. */
+.particle{
+  position:absolute;      /* Positioned inside the particles container. */
+  width:2px;height:2px;   /* 2x2 pixel â€” very small dot. */
+  background:var(--blue-light); /* Light purple color. */
+  border-radius:50%;      /* Circular. */
+  animation:drift linear infinite; /* Drifts upward continuously. Duration set by JavaScript per particle. */
+}
+
+/* The drift animation moves particles upward and slightly sideways while fading out. */
+@keyframes drift{
+  from{transform:translateY(0) translateX(0);opacity:0.5}      /* Starts at original position, 50% visible. */
+  50%{opacity:0.8}                                             /* Gets brighter halfway up. */
+  to{transform:translateY(-100px) translateX(20px);opacity:0}  /* Ends 100px up, 20px right, invisible. */
+}
+
+
+/* -------------------------------------------
+   SCROLLBAR
+   Custom styling for the browser scrollbar.
+   Only works in Chrome, Edge, and Safari.
+------------------------------------------- */
+
+::-webkit-scrollbar{width:4px}                                       /* Scrollbar is only 4px wide. */
+::-webkit-scrollbar-track{background:var(--bg-base)}                 /* Track (background) matches page color. */
+::-webkit-scrollbar-thumb{background:rgba(59,130,246,0.35);border-radius:2px} /* The draggable part is blue. */
+
+
+/* -------------------------------------------
+   RESPONSIVE DESIGN â€” MOBILE (max 768px)
+   These rules OVERRIDE the desktop styles
+   when the screen is 768px wide or smaller.
+   Think of it as a separate set of rules
+   that kick in on phones.
+------------------------------------------- */
+@media(max-width:768px){
+  .hero-layout{grid-template-columns:1fr;gap:2.5rem}
+  .hero-top{text-align:center}
+  .hero-cta-row{justify-content:center}
+  .hero-sub{margin-inline:auto}
+  .nav-links{display:none}   /* Hides the desktop nav links on mobile. */
+  #menu-btn{display:flex}    /* Shows the hamburger menu button on mobile. */
+
+  .hero-title{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:clamp(2.8rem,5vw,5rem);
+  line-height:1.02;
+  color:#fff;
+  margin-bottom:1.25rem;
+  letter-spacing:0;
+} /* Smaller headline on mobile. */
+  .hero-title .line{white-space:normal}  /* Allows headline lines to wrap naturally. */
+  .hero-scene{
+  width:100%;
+  min-height:430px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+} /* Shorter 3D scene on mobile. */
+  .ring-1{width:280px;height:280px}  /* Rings scale down for mobile. */
+  .ring-2{width:200px;height:200px}
+  .ring-3{width:130px;height:130px}
+  .hero-glow{width:220px;height:220px}  /* Smaller glow disc on mobile. */
+  .hero-stats-bar{flex-direction:row;flex-wrap:wrap} /* Stats wrap to next line if needed. */
+  .stat-item{min-width:33%}  /* Each stat is at least one-third of the bar width. */
+
+  .services-grid{grid-template-columns:1fr}  /* Services: 1 column on mobile (was 3). */
+  .projects-grid{grid-template-columns:1fr}  /* Projects: 1 column on mobile (was 3). */
+  .form-row{grid-template-columns:1fr}       /* Name and Email stack vertically on mobile. */
+
+  .footer-inner{flex-direction:column;text-align:center} /* Footer stacks vertically and centers. */
+  .contact-meta{flex-direction:column;gap:0.75rem}       /* Social links stack vertically. */
+}
+
+/* -------------------------------------------
+   RESPONSIVE DESIGN â€” TABLET (769px to 1024px)
+   Rules for medium-sized screens like tablets.
+------------------------------------------- */
+@media(min-width:769px) and (max-width:1024px){
+  .hero-layout{grid-template-columns:minmax(0,1fr) minmax(320px,0.85fr);gap:2rem}
+  .hero-title{font-size:clamp(2.6rem,5vw,3.8rem)}
+  .services-grid{grid-template-columns:1fr 1fr}  /* Services: 2 columns on tablet (was 3). */
+  .projects-grid{grid-template-columns:1fr 1fr}  /* Projects: 2 columns on tablet (was 3). */
+  .hero-scene{
+  width:100%;
+  min-height:430px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}    /* 3D scene is shorter on tablet. */
+  .ring-1{width:340px;height:340px} /* Rings scale down for tablet. */
+  .ring-2{width:240px;height:240px}
+}
+
+/* Hero desktop realignment fix */
+@media (min-width: 1025px){
+  .hero-layout{
+    display:grid;
+    grid-template-columns:minmax(0, 620px) minmax(360px, 520px);
+    grid-template-areas:
+      "copy scene"
+      "stats scene";
+    align-items:center;
+    justify-content:center;
+    gap:clamp(2.5rem,5vw,5.5rem);
+  }
+
+  .hero-top{
+    grid-area:copy;
+    align-items:flex-start;
+    text-align:left;
+    padding-top:0;
+  }
+
+  .hero-scene{
+    grid-area:scene;
+    min-height:460px;
+  }
+
+  .hero-stats-bar{
+    grid-area:stats;
+    justify-self:start;
+    width:min(100%, 560px);
+    margin-top:2.25rem;
+  }
+
+  .hero-title{
+    font-size:clamp(3rem,4.25vw,4.8rem);
+    line-height:1.03;
+  }
+
+  .hero-sub{
+    max-width:540px;
+    margin-inline:0;
+  }
+
+  .hero-cta-row{
+    justify-content:flex-start;
+  }
+}
+
+@media (max-width: 768px){
+  .hero-layout{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:2.5rem;
+  }
+
+  .hero-top{
+    align-items:center;
+    text-align:center;
+  }
+
+  .hero-sub{
+    margin-inline:auto;
+  }
+
+  .hero-cta-row{
+    justify-content:center;
+  }
+}

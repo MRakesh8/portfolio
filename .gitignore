@@ -1,0 +1,46 @@
+﻿# -------------------------------------------
+# Environment and secrets - NEVER commit these
+# -------------------------------------------
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+*.key
+*.pem
+*.p12
+secrets.json
+
+# -------------------------------------------
+# Node / package artifacts
+# -------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# -------------------------------------------
+# OS & editor junk
+# -------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/settings.json
+.idea/
+*.suo
+*.user
+*.swp
+*~
+
+# -------------------------------------------
+# Temporary / debug files
+# -------------------------------------------
+*.log
+*.tmp
+*.bak
+*.orig
+
