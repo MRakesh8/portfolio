@@ -290,77 +290,160 @@ if (particleContainer && !prefersReducedMotion) {
 
 
 /* -------------------------------------------
-   3D CUBE — POINTER TRACKING
-   When the mouse moves over the hero scene,
-   the cube rotates to follow the mouse position.
-   This gives an interactive 3D feel.
+   3D CUBE — SMOOTH POINTER / TOUCH TRACKING
+   Desktop: follows cursor on hover.
+   Mobile: drag anywhere on the scene (pointer capture).
+   Rotation is smoothed with requestAnimationFrame lerp.
 ------------------------------------------- */
 
 const heroVisual = document.querySelector('.hero-scene');
-// Finds the .hero-scene div — the 3D stage that contains the cube and rings.
-
 const cube = document.querySelector('.cube');
-// Finds the .cube div — the 3D box we want to rotate.
 
 if (heroVisual && cube) {
+  const isCoarsePointer = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const DEFAULT_X = -15;
+  const DEFAULT_Y = 28;
 
-  const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-  let idleFrame = null;
-  let idleStart = performance.now();
+  const cubeState = {
+    currentX: DEFAULT_X,
+    currentY: DEFAULT_Y,
+    targetX: DEFAULT_X,
+    targetY: DEFAULT_Y,
+    dragging: false,
+    pointerDown: false,
+    idle: isCoarsePointer && !prefersReducedMotion,
+    rafId: null
+  };
 
-  function runCubeIdle(now) {
-    if (!isTouch || prefersReducedMotion) return;
-    const t = (now - idleStart) / 1000;
-    cube.style.setProperty('--cube-y', (28 + Math.sin(t * 0.5) * 18) + 'deg');
-    cube.style.setProperty('--cube-x', (-15 + Math.cos(t * 0.4) * 10) + 'deg');
-    idleFrame = requestAnimationFrame(runCubeIdle);
+  function setTargetsFromClient(clientX, clientY) {
+    const r = heroVisual.getBoundingClientRect();
+    const x = (clientX - r.left) / r.width - 0.5;
+    const y = (clientY - r.top) / r.height - 0.5;
+    cubeState.targetY = DEFAULT_Y + x * 80;
+    cubeState.targetX = DEFAULT_X - y * 60;
   }
 
-  if (isTouch && !prefersReducedMotion) {
-    idleFrame = requestAnimationFrame(runCubeIdle);
+  function applyCubeRotation() {
+    cube.style.setProperty('--cube-x', cubeState.currentX.toFixed(2) + 'deg');
+    cube.style.setProperty('--cube-y', cubeState.currentY.toFixed(2) + 'deg');
   }
+
+  function lerp(current, target, amount) {
+    return current + (target - current) * amount;
+  }
+
+  function tick(now) {
+    if (cubeState.idle && !cubeState.dragging && !prefersReducedMotion) {
+      const t = now / 1000;
+      cubeState.targetY = DEFAULT_Y + Math.sin(t * 0.5) * 18;
+      cubeState.targetX = DEFAULT_X + Math.cos(t * 0.4) * 10;
+    }
+
+    const ease = cubeState.dragging
+      ? (isCoarsePointer ? 0.35 : 0.28)
+      : cubeState.pointerDown ? 0.22 : 0.14;
+    cubeState.currentX = lerp(cubeState.currentX, cubeState.targetX, ease);
+    cubeState.currentY = lerp(cubeState.currentY, cubeState.targetY, ease);
+    applyCubeRotation();
+
+    const dx = Math.abs(cubeState.targetX - cubeState.currentX);
+    const dy = Math.abs(cubeState.targetY - cubeState.currentY);
+    const needsFrame = cubeState.dragging || cubeState.idle || dx > 0.05 || dy > 0.05;
+
+    if (needsFrame) {
+      cubeState.rafId = requestAnimationFrame(tick);
+    } else {
+      cubeState.rafId = null;
+    }
+  }
+
+  function startCubeLoop() {
+    if (!cubeState.rafId) {
+      cubeState.rafId = requestAnimationFrame(tick);
+    }
+  }
+
+  function stopCubeLoop() {
+    if (cubeState.rafId) {
+      cancelAnimationFrame(cubeState.rafId);
+      cubeState.rafId = null;
+    }
+  }
+
+  function beginInteraction(e) {
+    cubeState.pointerDown = true;
+    cubeState.dragging = true;
+    cubeState.idle = false;
+    heroVisual.classList.add('is-interacting');
+    heroVisual.setPointerCapture(e.pointerId);
+    setTargetsFromClient(e.clientX, e.clientY);
+    startCubeLoop();
+  }
+
+  function endInteraction(e) {
+    if (!cubeState.pointerDown) return;
+
+    cubeState.pointerDown = false;
+    cubeState.dragging = false;
+    heroVisual.classList.remove('is-interacting');
+
+    try {
+      heroVisual.releasePointerCapture(e.pointerId);
+    } catch (_) {
+      /* pointer may already be released */
+    }
+
+    if (isCoarsePointer) {
+      cubeState.targetX = DEFAULT_X;
+      cubeState.targetY = DEFAULT_Y;
+      cubeState.idle = !prefersReducedMotion;
+      startCubeLoop();
+      return;
+    }
+
+    cubeState.targetX = DEFAULT_X;
+    cubeState.targetY = DEFAULT_Y;
+    startCubeLoop();
+  }
+
+  heroVisual.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    beginInteraction(e);
+  }, { passive: false });
 
   heroVisual.addEventListener('pointermove', e => {
-    heroVisual.classList.add('is-interacting');
+    if (cubeState.dragging) {
+      setTargetsFromClient(e.clientX, e.clientY);
+      startCubeLoop();
+      return;
+    }
 
-    const r = heroVisual.getBoundingClientRect();
-    // getBoundingClientRect() returns the size and position of the hero-scene on screen.
-    // r.left = left edge pixel position. r.width = pixel width. etc.
-
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    // e.clientX = the horizontal pixel position of the mouse on the screen.
-    // - r.left = subtract the left edge of the scene to get position relative to the scene.
-    // / r.width = divide by the scene width to get a value from 0 to 1.
-    // - 0.5 = shift so the center is 0, left is -0.5, right is +0.5.
-
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    // Same calculation but vertically.
-    // e.clientY = vertical mouse position. r.top = top edge. r.height = total height.
-
-    cube.style.setProperty('--cube-y', (28 + x * 80) + 'deg');
-    // setProperty sets the CSS custom property --cube-y on the cube.
-    // 28 is the default rotation (cube rests at 28 degrees).
-    // x * 80 adds up to 40 degrees left or right based on mouse position.
-    // CSS reads this variable: transform: rotateY(var(--cube-y)) — making the cube turn.
-
-    cube.style.setProperty('--cube-x', (-15 - y * 60) + 'deg');
-
-    if (idleFrame) {
-      cancelAnimationFrame(idleFrame);
-      idleFrame = null;
+    if (!isCoarsePointer && e.pointerType === 'mouse') {
+      heroVisual.classList.add('is-interacting');
+      setTargetsFromClient(e.clientX, e.clientY);
+      startCubeLoop();
     }
   });
+
+  heroVisual.addEventListener('pointerup', endInteraction);
+  heroVisual.addEventListener('pointercancel', endInteraction);
 
   heroVisual.addEventListener('pointerleave', () => {
-    heroVisual.classList.remove('is-interacting');
-    cube.style.setProperty('--cube-y', '28deg');
-    cube.style.setProperty('--cube-x', '-15deg');
+    if (cubeState.dragging) return;
 
-    if (isTouch && !prefersReducedMotion && !idleFrame) {
-      idleStart = performance.now();
-      idleFrame = requestAnimationFrame(runCubeIdle);
+    heroVisual.classList.remove('is-interacting');
+
+    if (!isCoarsePointer) {
+      cubeState.targetX = DEFAULT_X;
+      cubeState.targetY = DEFAULT_Y;
+      startCubeLoop();
     }
   });
+
+  if (cubeState.idle) {
+    startCubeLoop();
+  }
 }
 
 

@@ -662,6 +662,14 @@ body::after{
   display:flex;
   align-items:center;
   justify-content:center;
+  touch-action:none;
+  cursor:grab;
+  -webkit-user-select:none;
+  user-select:none;
+}
+
+.hero-scene.is-interacting{
+  cursor:grabbing;
 }
 
 /* The soft purple/blue glow behind the cube. */
@@ -705,16 +713,19 @@ body::after{
 
 /* The perspective wrapper gives the cube its 3D depth.
    A larger perspective value makes the 3D effect look more distant (less extreme). */
-.cube-wrap{perspective:900px}
+.cube-wrap{
+  perspective:900px;
+  position:relative;
+  z-index:2;
+}
 
-/* The 3D cube itself. */
 .cube{
   width:110px;height:110px;
   position:relative;
   transform-style:preserve-3d;
-  transform:rotateX(var(--cube-x,-15deg)) rotateY(var(--cube-y,28deg));
-  transition:transform 200ms var(--ease-out-expo);
+  transform:rotateX(var(--cube-x,-15deg)) rotateY(var(--cube-y,28deg)) translateZ(0);
   will-change:transform;
+  backface-visibility:hidden;
   animation:cubeGlow 12s ease-in-out infinite;
 }
 
@@ -749,22 +760,23 @@ body::after{
 
 /* The floating tech label pills (React, Node.js, Tailwind etc.) around the cube. */
 .float-tag{
-  position:absolute;        /* Positioned inside .hero-scene. */
-  display:inline-flex;      /* Icon dot and text side by side. */
-  align-items:center;       /* Vertically centered. */
-  gap:6px;                  /* Space between the color dot and text. */
-  background:rgba(5,10,24,0.88); /* Very dark, nearly opaque background. */
-  border:1px solid rgba(139,92,246,0.3); /* Faint purple border. */
-  color:#c4b5fd;            /* Light purple text. */
-  font-family:var(--font-display); /* Heading font. */
-  font-size:0.7rem;         /* Small text. */
-  font-weight:600;          /* Semi-bold. */
-  letter-spacing:0.05em;   /* Slightly spread letters. */
-  padding:6px 14px;         /* Inner spacing. */
-  border-radius:999px;      /* Pill shape. */
-  backdrop-filter:blur(14px); /* Blurs what is behind the tag. */
-  white-space:nowrap;       /* Never wraps text to a second line. */
-  box-shadow:0 4px 18px rgba(139,92,246,0.12); /* Soft purple shadow below. */
+  position:absolute;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:rgba(5,10,24,0.88);
+  border:1px solid rgba(139,92,246,0.3);
+  color:#c4b5fd;
+  font-family:var(--font-display);
+  font-size:0.7rem;
+  font-weight:600;
+  letter-spacing:0.05em;
+  padding:6px 14px;
+  border-radius:999px;
+  backdrop-filter:blur(14px);
+  white-space:nowrap;
+  box-shadow:0 4px 18px rgba(139,92,246,0.12);
+  pointer-events:none;
 }
 
 /* The small colored circle inside each tech tag (brand color indicator). */
@@ -1493,7 +1505,8 @@ footer{
     min-height:min(340px, 52vw);
     max-width:100%;
     margin-inline:auto;
-    overflow:hidden;
+    overflow:visible;
+    touch-action:none;
   }
 
   .ring-1{width:min(280px, 88vw);height:min(280px, 88vw)}
@@ -1501,6 +1514,11 @@ footer{
   .ring-3{width:min(130px, 40vw);height:min(130px, 40vw)}
 
   .hero-glow{width:min(220px, 70vw);height:min(220px, 70vw)}
+
+  .cube-wrap{
+    padding:clamp(32px, 12vw, 56px);
+    margin:-clamp(32px, 12vw, 56px);
+  }
 
   .cube, .face{width:90px;height:90px}
   .face.front {transform:translateZ(45px)}
@@ -1541,6 +1559,11 @@ footer{
 
   .card:hover{
     transform:translateY(-6px) scale(1.01);
+  }
+
+  .reveal{
+    filter:blur(3px);
+    transform:translateY(20px) scale(0.99);
   }
 
   .footer-inner{
