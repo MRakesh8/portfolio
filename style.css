@@ -1518,6 +1518,75 @@ footer{
    that kick in on phones.
 ------------------------------------------- */
 @media(max-width:768px){
+  html{
+    -webkit-text-size-adjust:100%;
+  }
+
+  body{
+    background-attachment:scroll;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility;
+  }
+
+  body::after{
+    position:absolute;
+    display:none;
+  }
+
+  .gradient-text{
+    filter:none;
+  }
+
+  .reveal,
+  .reveal:not(.hero-scene){
+    filter:none;
+    transform:translateY(18px);
+    transition:opacity 0.55s ease, transform 0.55s ease;
+  }
+
+  .reveal.visible,
+  .reveal:not(.hero-scene).visible{
+    filter:none;
+    transform:translateY(0);
+  }
+
+  .card,
+  #navbar,
+  #navbar.scrolled,
+  #mobile-nav,
+  .badge,
+  .hero-stats-bar,
+  .float-tag{
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+  }
+
+  .card{
+    background:linear-gradient(145deg, rgba(30,41,59,0.94), rgba(15,23,42,0.98));
+  }
+
+  #navbar,
+  #navbar.scrolled{
+    background:rgba(3,7,18,0.97);
+  }
+
+  #mobile-nav{
+    background:rgba(3,7,18,0.98);
+  }
+
+  .hero-stats-bar{
+    background:rgba(17,24,39,0.85);
+  }
+
+  .badge{
+    background:rgba(30,41,59,0.9);
+  }
+
+  .float-tag{
+    background:rgba(5,10,24,0.95);
+  }
+
   .nav-links{display:none}
   #menu-btn{
     display:flex;
@@ -1635,12 +1704,15 @@ footer{
   .form-row{grid-template-columns:1fr}
 
   .card:hover{
-    transform:translateY(-6px) scale(1.01);
+    transform:translateY(-6px);
   }
 
-  .reveal:not(.hero-scene){
-    filter:blur(3px);
-    transform:translateY(20px) scale(0.99);
+  .badge:hover{
+    transform:translateY(-2px);
+  }
+
+  .cube{
+    will-change:auto;
   }
 
   .footer-inner{
