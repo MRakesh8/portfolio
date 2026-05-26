@@ -46,8 +46,10 @@ body {
   background-attachment: fixed;     /* The background gradient stays fixed when you scroll (parallax feel). */
   color: var(--text-primary);       /* Default text color for the whole page (light grey/white). */
   font-family: 'DM Sans', sans-serif; /* Default font. 'DM Sans' loads from Google Fonts. */
-  overflow-x: hidden;               /* Hides horizontal overflow at the body level as a safety net. */
-  line-height: 1.6;                 /* Spacing between lines of text (1.6 x the font size). Helps readability. */
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* Removes the small gap below images and SVG icons that browsers add by default. */
@@ -87,6 +89,8 @@ ul{list-style:none}
   --radius-lg: 16px;                   /* Large border-radius â€” very rounded corners. */
   --transition: 0.3s ease;            /* Default animation speed for hover effects. 0.3 seconds, smooth ease. */
   --font-display: 'Syne', sans-serif; /* Display/heading font loaded from Google Fonts. */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1);
 }
 
 
@@ -129,10 +133,12 @@ body::after{
   mix-blend-mode: screen;                        /* Makes the orb blend with the background like a light source. */
 }
 
-/* The pulseOrb animation makes the orb slowly breathe â€” growing and drifting. */
+/* The pulseOrb animation makes the orb slowly breathe — growing and drifting. */
 @keyframes pulseOrb {
-  0%   { transform: scale(1) translate(0, 0); opacity: 0.5; }          /* Start: normal size, 50% visible. */
-  100% { transform: scale(1.1) translate(20px, -20px); opacity: 0.8; } /* End: 10% bigger, shifted up-right, 80% visible. */
+  0%   { transform: scale(1) translate(0, 0); opacity: 0.45; }
+  33%  { transform: scale(1.08) translate(12px, -16px); opacity: 0.65; }
+  66%  { transform: scale(0.96) translate(-8px, 10px); opacity: 0.55; }
+  100% { transform: scale(1.12) translate(20px, -20px); opacity: 0.82; }
 }
 
 
@@ -156,14 +162,14 @@ body::after{
   -webkit-text-fill-color:transparent; /* Makes the text transparent so the gradient shows through. */
   background-clip:text;             /* Standard version of the same property. */
 
-  animation: gradientText 6s ease infinite; /* Animates the gradient position every 6 seconds, looping forever. */
+  animation: gradientText 5s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.25));
 }
 
-/* gradientText moves the gradient background left and right to create the flowing color effect. */
 @keyframes gradientText {
-  0%   { background-position: 0% 50%; }   /* Gradient starts at the left. */
-  50%  { background-position: 100% 50%; } /* Gradient moves to the right. */
-  100% { background-position: 0% 50%; }   /* Returns to the left. */
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 
@@ -198,20 +204,27 @@ body::after{
    (like "What I Do" or "Featured Work").
 ------------------------------------------- */
 .chip{
-  display:inline-flex;         /* Lays out the icon and text side by side. */
-  align-items:center;          /* Vertically centers the icon and text. */
-  gap:6px;                     /* 6px space between the icon and the text. */
-  background:var(--blue-dim);  /* Faint purple background. */
-  border:1px solid var(--blue-border); /* Thin white border. */
-  color:var(--blue-light);     /* Light purple text. */
-  font-family:var(--font-display); /* Uses the heading font. */
-  font-weight:600;             /* Semi-bold text. */
-  font-size:0.7rem;            /* Small text (0.7 x 16px = 11.2px). */
-  letter-spacing:0.1em;        /* Spreads the letters apart slightly. */
-  text-transform:uppercase;    /* Converts all letters to capitals. */
-  padding:5px 14px;            /* 5px top/bottom, 14px left/right spacing inside the pill. */
-  border-radius:999px;         /* A very large radius = fully rounded pill shape. */
-  margin-bottom:1.25rem;       /* Space below the chip before the section title. */
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--blue-dim);
+  border:1px solid var(--blue-border);
+  color:var(--blue-light);
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:0.7rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:5px 14px;
+  border-radius:999px;
+  margin-bottom:1.25rem;
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.12);
+  animation: chipGlow 4s ease-in-out infinite;
+}
+
+@keyframes chipGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.1); border-color: var(--blue-border); }
+  50%      { box-shadow: 0 0 28px rgba(139, 92, 246, 0.22); border-color: rgba(139, 92, 246, 0.35); }
 }
 
 
@@ -266,16 +279,31 @@ body::after{
 
   /* How the card animates when you hover.
      cubic-bezier is a custom speed curve â€” this one has a slight bounce at the end. */
-  transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.45s var(--ease-spring), border-color 0.35s ease, box-shadow 0.45s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* When the mouse hovers over a card. */
+.card::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%);
+  transform:translateX(-120%);
+  transition:transform 0.7s ease;
+  pointer-events:none;
+}
+
+.card:hover::after{
+  transform:translateX(120%);
+}
+
 .card:hover{
-  border-color:var(--blue-border-strong);         /* Border becomes brighter purple. */
-  transform:translateY(-10px) scale(1.02);        /* Card lifts up 10px and grows slightly. */
-  box-shadow:0 15px 40px -10px rgba(139, 92, 246, 0.3), /* Purple shadow underneath. */
-             inset 0 0 20px rgba(255,255,255,0.03); /* Very faint inner glow. */
-  z-index: 10; /* Brings the hovered card in front of others. */
+  border-color:var(--blue-border-strong);
+  transform:translateY(-10px) scale(1.02);
+  box-shadow:0 20px 50px -12px rgba(139, 92, 246, 0.35),
+             inset 0 0 24px rgba(255,255,255,0.04);
+  z-index: 10;
 }
 
 /* .card-highlight adds a glowing top border line to featured cards. */
@@ -418,13 +446,31 @@ body::after{
 
 /* Individual navigation links. */
 .nav-links a{
-  color:var(--text-muted); /* Grey by default. */
-  font-size:0.9rem;        /* Slightly smaller than body. */
-  font-weight:500;         /* Medium weight. */
-  transition:color var(--transition); /* Smooth color change on hover. */
+  position:relative;
+  color:var(--text-muted);
+  font-size:0.9rem;
+  font-weight:500;
+  transition:color var(--transition);
 }
 
-/* Link turns light purple when hovered. */
+.nav-links a:not(.btn)::after{
+  content:'';
+  position:absolute;
+  left:0;
+  bottom:-4px;
+  width:100%;
+  height:2px;
+  background:linear-gradient(90deg, var(--blue), var(--blue-light));
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.35s var(--ease-out-expo);
+  border-radius:2px;
+}
+
+.nav-links a:not(.btn):hover::after{
+  transform:scaleX(1);
+}
+
 .nav-links a:hover{color:var(--blue-light)}
 
 /* The "Let's Talk" button in the navbar â€” slightly smaller than standard buttons. */
@@ -472,7 +518,15 @@ body::after{
 }
 
 /* When JavaScript adds the "open" class, the menu becomes visible. */
-#mobile-nav.open{display:flex}
+#mobile-nav.open{
+  display:flex;
+  animation:mobileNavIn 0.35s var(--ease-out-expo) forwards;
+}
+
+@keyframes mobileNavIn{
+  from{opacity:0;transform:translateY(-8px)}
+  to{opacity:1;transform:translateY(0)}
+}
 
 /* Individual links inside the mobile menu. */
 #mobile-nav a{
@@ -655,25 +709,32 @@ body::after{
 
 /* The 3D cube itself. */
 .cube{
-  width:110px;height:110px;  /* 110 x 110 pixels. */
-  position:relative;         /* Needed for the faces to be positioned inside. */
-  transform-style:preserve-3d; /* Tells the browser to render children in 3D space. */
-
-  /* CSS custom properties --cube-x and --cube-y are set by JavaScript on mouse move.
-     The fallback values are -15deg and 28deg so it looks good without interaction. */
+  width:110px;height:110px;
+  position:relative;
+  transform-style:preserve-3d;
   transform:rotateX(var(--cube-x,-15deg)) rotateY(var(--cube-y,28deg));
+  transition:transform 200ms var(--ease-out-expo);
+  will-change:transform;
+  animation:cubeGlow 12s ease-in-out infinite;
+}
 
-  transition:transform 160ms ease-out; /* Smooth 160ms rotation when the mouse moves. */
-  will-change:transform;    /* Tells the browser to prepare for frequent transform changes (performance hint). */
+.hero-scene.is-interacting .cube{
+  animation-play-state:paused;
+}
+
+@keyframes cubeGlow{
+  0%, 100% { filter: drop-shadow(0 0 24px rgba(139, 92, 246, 0.35)); }
+  50%      { filter: drop-shadow(0 0 36px rgba(167, 139, 250, 0.5)); }
 }
 
 /* Each of the six square faces of the cube. */
 .face{
-  position:absolute;         /* All six faces stack in the same 3D space. */
-  width:110px;height:110px;  /* Same size as the cube. */
-  border:1px solid rgba(139,92,246,0.5); /* Purple border on each face. */
-  /* Very subtle purple-to-blue gradient background. */
-  background:linear-gradient(135deg,rgba(139,92,246,0.05),rgba(59,130,246,0.07));
+  position:absolute;
+  width:110px;height:110px;
+  border:1px solid rgba(167,139,250,0.55);
+  background:linear-gradient(145deg, rgba(139,92,246,0.12), rgba(59,130,246,0.08));
+  box-shadow:inset 0 0 30px rgba(139, 92, 246, 0.15);
+  backdrop-filter:blur(2px);
 }
 
 /* translateZ moves a face forward or backward along the Z axis (depth).
@@ -917,6 +978,32 @@ body::after{
 
 /* Project cards have no padding â€” the thumbnail image goes edge-to-edge. */
 .project-card{overflow:hidden;padding:0}
+
+.project-card:hover .project-thumb::before{
+  opacity:1;
+  transform:translateX(100%);
+}
+
+.project-thumb::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  transform:translateX(-100%);
+  opacity:0;
+  transition:transform 0.8s ease, opacity 0.3s ease;
+  pointer-events:none;
+  z-index:2;
+}
+
+.project-card:hover .thumb-icon svg{
+  transform:scale(1.08);
+  opacity:0.9;
+}
+
+.thumb-icon svg{
+  transition:transform 0.4s var(--ease-spring), opacity 0.4s ease;
+}
 
 /* The top image/preview area of each project card. */
 .project-thumb{
@@ -1271,20 +1358,25 @@ footer{
    triggers this animation.
 ------------------------------------------- */
 
-/* Initial hidden state: invisible and shifted 26px down. */
 .reveal{
-  opacity:0;               /* Fully invisible. */
-  transform:translateY(26px); /* Shifted 26px downward. */
-  transition:opacity 0.65s ease,transform 0.65s ease; /* Animates over 0.65 seconds. */
+  opacity:0;
+  transform:translateY(32px) scale(0.98);
+  filter:blur(6px);
+  transition:
+    opacity 0.75s var(--ease-out-expo),
+    transform 0.75s var(--ease-out-expo),
+    filter 0.75s var(--ease-out-expo);
 }
 
-/* Staggered animation delays so elements appear one after another. */
-.reveal.d1{transition-delay:0.08s}  /* Appears 0.08s after becoming visible. */
-.reveal.d2{transition-delay:0.16s}  /* Appears 0.16s after becoming visible. */
-.reveal.d3{transition-delay:0.24s}  /* Appears 0.24s after becoming visible. */
+.reveal.d1{transition-delay:0.06s}
+.reveal.d2{transition-delay:0.12s}
+.reveal.d3{transition-delay:0.18s}
 
-/* When JavaScript adds "visible", the element fades in and moves to its normal position. */
-.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal.visible{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  filter:blur(0);
+}
 
 
 /* -------------------------------------------
@@ -1302,11 +1394,19 @@ footer{
   animation:drift linear infinite; /* Drifts upward continuously. Duration set by JavaScript per particle. */
 }
 
-/* The drift animation moves particles upward and slightly sideways while fading out. */
 @keyframes drift{
-  from{transform:translateY(0) translateX(0);opacity:0.5}      /* Starts at original position, 50% visible. */
-  50%{opacity:0.8}                                             /* Gets brighter halfway up. */
-  to{transform:translateY(-100px) translateX(20px);opacity:0}  /* Ends 100px up, 20px right, invisible. */
+  0%   { transform:translateY(0) translateX(0) scale(1); opacity:0.4; }
+  40%  { opacity:0.9; }
+  100% { transform:translateY(-120px) translateX(24px) scale(0.5); opacity:0; }
+}
+
+@keyframes particleTwinkle{
+  0%, 100% { box-shadow: 0 0 4px rgba(167, 139, 250, 0.4); }
+  50%      { box-shadow: 0 0 10px rgba(196, 181, 253, 0.9); }
+}
+
+.particle.twinkle{
+  animation: drift linear infinite, particleTwinkle 3s ease-in-out infinite;
 }
 
 
@@ -1329,44 +1429,140 @@ footer{
    that kick in on phones.
 ------------------------------------------- */
 @media(max-width:768px){
-  .hero-layout{grid-template-columns:1fr;gap:2.5rem}
-  .hero-top{text-align:center}
-  .hero-cta-row{justify-content:center}
-  .hero-sub{margin-inline:auto}
-  .nav-links{display:none}   /* Hides the desktop nav links on mobile. */
-  #menu-btn{display:flex}    /* Shows the hamburger menu button on mobile. */
+  .nav-links{display:none}
+  #menu-btn{
+    display:flex;
+    min-width:44px;
+    min-height:44px;
+    align-items:center;
+    justify-content:center;
+  }
+
+  #navbar{
+    padding-top:env(safe-area-inset-top, 0);
+  }
+
+  .nav-inner{
+    height:56px;
+    padding-inline:max(1rem, env(safe-area-inset-left, 0)) max(1rem, env(safe-area-inset-right, 0));
+  }
+
+  #hero{
+    padding-top:56px;
+    min-height:100dvh;
+  }
+
+  .hero-layout{
+    grid-template-columns:1fr;
+    gap:2rem;
+    padding-inline:max(1rem, env(safe-area-inset-left, 0)) max(1rem, env(safe-area-inset-right, 0));
+  }
+
+  .hero-top{
+    text-align:center;
+    padding-top:1.5rem;
+  }
 
   .hero-title{
-  font-family:var(--font-display);
-  font-weight:800;
-  font-size:clamp(2.8rem,5vw,5rem);
-  line-height:1.02;
-  color:#fff;
-  margin-bottom:1.25rem;
-  letter-spacing:0;
-} /* Smaller headline on mobile. */
-  .hero-title .line{white-space:normal}  /* Allows headline lines to wrap naturally. */
+    font-size:clamp(2rem, 9vw, 2.75rem);
+    line-height:1.08;
+    letter-spacing:-0.02em;
+  }
+
+  .hero-title .line{white-space:normal}
+
+  .hero-sub{
+    font-size:0.95rem;
+    max-width:100%;
+    margin-inline:auto;
+    padding-inline:0.25rem;
+  }
+
+  .hero-cta-row{
+    justify-content:center;
+    width:100%;
+  }
+
+  .hero-cta-row .btn{
+    min-height:48px;
+    flex:1 1 auto;
+    max-width:100%;
+  }
+
   .hero-scene{
-  width:100%;
-  min-height:430px;
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-} /* Shorter 3D scene on mobile. */
-  .ring-1{width:280px;height:280px}  /* Rings scale down for mobile. */
-  .ring-2{width:200px;height:200px}
-  .ring-3{width:130px;height:130px}
-  .hero-glow{width:220px;height:220px}  /* Smaller glow disc on mobile. */
-  .hero-stats-bar{flex-direction:row;flex-wrap:wrap} /* Stats wrap to next line if needed. */
-  .stat-item{min-width:33%}  /* Each stat is at least one-third of the bar width. */
+    min-height:min(340px, 52vw);
+    max-width:100%;
+    margin-inline:auto;
+    overflow:hidden;
+  }
 
-  .services-grid{grid-template-columns:1fr}  /* Services: 1 column on mobile (was 3). */
-  .projects-grid{grid-template-columns:1fr}  /* Projects: 1 column on mobile (was 3). */
-  .form-row{grid-template-columns:1fr}       /* Name and Email stack vertically on mobile. */
+  .ring-1{width:min(280px, 88vw);height:min(280px, 88vw)}
+  .ring-2{width:min(200px, 62vw);height:min(200px, 62vw)}
+  .ring-3{width:min(130px, 40vw);height:min(130px, 40vw)}
 
-  .footer-inner{flex-direction:column;text-align:center} /* Footer stacks vertically and centers. */
-  .contact-meta{flex-direction:column;gap:0.75rem}       /* Social links stack vertically. */
+  .hero-glow{width:min(220px, 70vw);height:min(220px, 70vw)}
+
+  .cube, .face{width:90px;height:90px}
+  .face.front {transform:translateZ(45px)}
+  .face.back  {transform:rotateY(180deg) translateZ(45px)}
+  .face.left  {transform:rotateY(-90deg) translateZ(45px)}
+  .face.right {transform:rotateY(90deg) translateZ(45px)}
+  .face.top   {transform:rotateX(90deg) translateZ(45px)}
+  .face.bottom{transform:rotateX(-90deg) translateZ(45px)}
+
+  .float-tag{
+    font-size:0.62rem;
+    padding:5px 10px;
+  }
+
+  .ft2{left:0}
+  .ft3{right:0}
+  .ft4{left:2%;bottom:18%}
+  .ft5{right:2%;bottom:18%}
+
+  .orb{
+    filter:blur(60px);
+    animation-duration:10s;
+  }
+
+  .hero-stats-bar{
+    width:100%;
+    max-width:100%;
+    margin-top:0.5rem;
+  }
+
+  .stat-num{font-size:1.4rem}
+  .stat-label{font-size:0.58rem}
+
+  .section{padding-block:clamp(3rem, 8vw, 5rem)}
+  .services-grid{grid-template-columns:1fr}
+  .projects-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+
+  .card:hover{
+    transform:translateY(-6px) scale(1.01);
+  }
+
+  .footer-inner{
+    flex-direction:column;
+    text-align:center;
+    padding-bottom:max(1rem, env(safe-area-inset-bottom, 0));
+  }
+
+  .contact-meta{flex-direction:column;gap:0.75rem}
+
+  #mobile-nav a{
+    min-height:48px;
+    display:flex;
+    align-items:center;
+  }
+
+  input, select, textarea{
+    font-size:16px;
+    min-height:48px;
+  }
+
+  textarea{min-height:120px}
 }
 
 /* -------------------------------------------
@@ -1376,18 +1572,12 @@ footer{
 @media(min-width:769px) and (max-width:1024px){
   .hero-layout{grid-template-columns:minmax(0,1fr) minmax(320px,0.85fr);gap:2rem}
   .hero-title{font-size:clamp(2.6rem,5vw,3.8rem)}
-  .services-grid{grid-template-columns:1fr 1fr}  /* Services: 2 columns on tablet (was 3). */
-  .projects-grid{grid-template-columns:1fr 1fr}  /* Projects: 2 columns on tablet (was 3). */
-  .hero-scene{
-  width:100%;
-  min-height:430px;
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}    /* 3D scene is shorter on tablet. */
-  .ring-1{width:340px;height:340px} /* Rings scale down for tablet. */
+  .services-grid{grid-template-columns:1fr 1fr}
+  .projects-grid{grid-template-columns:1fr 1fr}
+  .hero-scene{min-height:380px}
+  .ring-1{width:340px;height:340px}
   .ring-2{width:240px;height:240px}
+  .ring-3{width:155px;height:155px}
 }
 
 /* Hero desktop realignment fix */
@@ -1437,23 +1627,49 @@ footer{
   }
 }
 
-@media (max-width: 768px){
-  .hero-layout{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:2.5rem;
-  }
-
-  .hero-top{
-    align-items:center;
-    text-align:center;
-  }
-
-  .hero-sub{
-    margin-inline:auto;
-  }
-
+@media (max-width: 480px){
   .hero-cta-row{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .hero-cta-row .btn{
+    width:100%;
     justify-content:center;
   }
+
+  .ft1, .ft6{display:none}
+
+  .hero-stats-bar{
+    flex-direction:column;
+  }
+
+  .stat-item+.stat-item::before{
+    left:18%;
+    right:18%;
+    top:0;
+    bottom:auto;
+    width:auto;
+    height:1px;
+  }
+
+  .stat-item{min-width:100%;padding:0.9rem}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+
+  html{scroll-behavior:auto}
+
+  .reveal{
+    opacity:1;
+    transform:none;
+    filter:none;
+  }
+
+  .card::after{display:none}
 }

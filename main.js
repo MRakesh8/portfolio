@@ -192,6 +192,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
    and CSS animates them into view.
 ------------------------------------------- */
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const revealObserver = new IntersectionObserver(entries => {
 // IntersectionObserver watches elements and fires a callback when they
 // enter or leave the visible area (the "viewport") of the browser.
@@ -211,13 +213,18 @@ const revealObserver = new IntersectionObserver(entries => {
       // unobserve saves memory and CPU.
     }
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
-// threshold: 0.1 = fire when at least 10% of the element is visible.
-// rootMargin: '0px 0px -30px 0px' = shrinks the detection area 30px from the bottom.
-//   This means elements must scroll 30px above the bottom edge before revealing.
-//   It creates a nicer effect where content reveals just before reaching it.
+}, {
+  threshold: prefersReducedMotion ? 0 : 0.12,
+  rootMargin: prefersReducedMotion ? '0px' : '0px 0px -40px 0px'
+});
 
-document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+document.querySelectorAll('.reveal').forEach(el => {
+  if (prefersReducedMotion) {
+    el.classList.add('visible');
+    return;
+  }
+  revealObserver.observe(el);
+});
 // Find every element with class "reveal" and tell the observer to watch it.
 
 
@@ -230,18 +237,19 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 const particleContainer = document.getElementById('particles');
 // Finds the empty div#particles in the hero section.
 
-if (particleContainer) {
-// Safety check: only run this code if the particles div actually exists in the HTML.
+if (particleContainer && !prefersReducedMotion) {
 
-  for (let i = 0; i < 22; i++) {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const particleCount = isMobile ? 14 : 28;
+
+  for (let i = 0; i < particleCount; i++) {
   // A loop that runs 22 times (i starts at 0 and goes up to 21).
   // Each loop creates one particle dot.
 
     const p = document.createElement('div');
     // Create a new empty div element for this particle.
 
-    p.className = 'particle';
-    // Give it the CSS class "particle" which sets its color, size, and animation.
+    p.className = 'particle' + (Math.random() > 0.6 ? ' twinkle' : '');
 
     p.style.cssText = [
     // cssText lets us set multiple CSS styles as one string.
@@ -295,11 +303,25 @@ const cube = document.querySelector('.cube');
 // Finds the .cube div — the 3D box we want to rotate.
 
 if (heroVisual && cube) {
-// Safety check: only set up tracking if BOTH elements exist.
+
+  const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  let idleFrame = null;
+  let idleStart = performance.now();
+
+  function runCubeIdle(now) {
+    if (!isTouch || prefersReducedMotion) return;
+    const t = (now - idleStart) / 1000;
+    cube.style.setProperty('--cube-y', (28 + Math.sin(t * 0.5) * 18) + 'deg');
+    cube.style.setProperty('--cube-x', (-15 + Math.cos(t * 0.4) * 10) + 'deg');
+    idleFrame = requestAnimationFrame(runCubeIdle);
+  }
+
+  if (isTouch && !prefersReducedMotion) {
+    idleFrame = requestAnimationFrame(runCubeIdle);
+  }
 
   heroVisual.addEventListener('pointermove', e => {
-  // 'pointermove' fires for both mouse movement and finger dragging on touchscreens.
-  // It is better than 'mousemove' because it works on all devices.
+    heroVisual.classList.add('is-interacting');
 
     const r = heroVisual.getBoundingClientRect();
     // getBoundingClientRect() returns the size and position of the hero-scene on screen.
@@ -322,20 +344,22 @@ if (heroVisual && cube) {
     // CSS reads this variable: transform: rotateY(var(--cube-y)) — making the cube turn.
 
     cube.style.setProperty('--cube-x', (-15 - y * 60) + 'deg');
-    // -15 is the default tilt (slightly tilted forward).
-    // y * 60 adds tilt up or down based on vertical mouse position.
-    // CSS reads this: transform: rotateX(var(--cube-x)).
+
+    if (idleFrame) {
+      cancelAnimationFrame(idleFrame);
+      idleFrame = null;
+    }
   });
 
   heroVisual.addEventListener('pointerleave', () => {
-  // 'pointerleave' fires when the mouse exits the hero scene area.
-
+    heroVisual.classList.remove('is-interacting');
     cube.style.setProperty('--cube-y', '28deg');
-    // Reset the cube back to its default horizontal rotation.
-
     cube.style.setProperty('--cube-x', '-15deg');
-    // Reset the cube back to its default vertical tilt.
-    // The CSS transition (160ms ease-out) makes this reset animate smoothly.
+
+    if (isTouch && !prefersReducedMotion && !idleFrame) {
+      idleStart = performance.now();
+      idleFrame = requestAnimationFrame(runCubeIdle);
+    }
   });
 }
 
