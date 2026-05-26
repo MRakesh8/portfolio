@@ -301,8 +301,8 @@ const cube = document.querySelector('.cube');
 
 if (heroVisual && cube) {
   const isCoarsePointer = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-  const DEFAULT_X = -15;
-  const DEFAULT_Y = 28;
+  const DEFAULT_X = -22;
+  const DEFAULT_Y = 38;
 
   const cubeState = {
     currentX: DEFAULT_X,
@@ -311,7 +311,7 @@ if (heroVisual && cube) {
     targetY: DEFAULT_Y,
     dragging: false,
     pointerDown: false,
-    idle: isCoarsePointer && !prefersReducedMotion,
+    idle: !prefersReducedMotion,
     rafId: null
   };
 
@@ -333,7 +333,12 @@ if (heroVisual && cube) {
   }
 
   function tick(now) {
-    if (cubeState.idle && !cubeState.dragging && !prefersReducedMotion) {
+    if (
+      cubeState.idle &&
+      !cubeState.dragging &&
+      !heroVisual.classList.contains('is-interacting') &&
+      !prefersReducedMotion
+    ) {
       const t = now / 1000;
       cubeState.targetY = DEFAULT_Y + Math.sin(t * 0.5) * 18;
       cubeState.targetX = DEFAULT_X + Math.cos(t * 0.4) * 10;

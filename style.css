@@ -714,48 +714,118 @@ body::after{
 /* The perspective wrapper gives the cube its 3D depth.
    A larger perspective value makes the 3D effect look more distant (less extreme). */
 .cube-wrap{
-  perspective:900px;
+  perspective:520px;
+  perspective-origin:50% 48%;
+  transform-style:preserve-3d;
   position:relative;
   z-index:2;
+}
+
+.cube-wrap::before{
+  content:'';
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:200px;
+  height:200px;
+  transform:translate(-50%, -50%);
+  background:radial-gradient(circle, rgba(139,92,246,0.32) 0%, transparent 68%);
+  pointer-events:none;
+  z-index:-1;
+  animation:cubeAura 10s ease-in-out infinite;
+}
+
+.cube-wrap::after{
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:-32px;
+  width:120px;
+  height:28px;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse, rgba(139,92,246,0.45) 0%, transparent 72%);
+  pointer-events:none;
+  z-index:-1;
+}
+
+@keyframes cubeAura{
+  0%, 100% { opacity:0.65; transform:translate(-50%, -50%) scale(1); }
+  50%      { opacity:1; transform:translate(-50%, -50%) scale(1.12); }
 }
 
 .cube{
   width:110px;height:110px;
   position:relative;
   transform-style:preserve-3d;
-  transform:rotateX(var(--cube-x,-15deg)) rotateY(var(--cube-y,28deg)) translateZ(0);
+  transform:rotateX(var(--cube-x,-22deg)) rotateY(var(--cube-y,38deg)) translateZ(0);
   will-change:transform;
-  backface-visibility:hidden;
-  animation:cubeGlow 12s ease-in-out infinite;
 }
 
-.hero-scene.is-interacting .cube{
+.hero-scene.is-interacting .cube-wrap::before{
   animation-play-state:paused;
+  opacity:1;
 }
 
-@keyframes cubeGlow{
-  0%, 100% { filter: drop-shadow(0 0 24px rgba(139, 92, 246, 0.35)); }
-  50%      { filter: drop-shadow(0 0 36px rgba(167, 139, 250, 0.5)); }
-}
-
-/* Each of the six square faces of the cube. */
 .face{
   position:absolute;
-  width:110px;height:110px;
-  border:1px solid rgba(167,139,250,0.55);
-  background:linear-gradient(145deg, rgba(139,92,246,0.12), rgba(59,130,246,0.08));
-  box-shadow:inset 0 0 30px rgba(139, 92, 246, 0.15);
-  backdrop-filter:blur(2px);
+  inset:0;
+  width:110px;
+  height:110px;
+  transform-style:preserve-3d;
+  backface-visibility:visible;
+  -webkit-backface-visibility:visible;
+  border:1px solid rgba(196, 181, 253, 0.55);
+  box-shadow:
+    inset 0 0 40px rgba(139, 92, 246, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.12);
 }
 
-/* translateZ moves a face forward or backward along the Z axis (depth).
-   55px = half the cube's width (half of 110px), placing each face at the cube's edge. */
-.face.front {transform:translateZ(55px)}              /* Pushed toward the viewer. */
-.face.back  {transform:rotateY(180deg) translateZ(55px)} /* Flipped and pushed away. */
-.face.left  {transform:rotateY(-90deg) translateZ(55px)} /* Rotated left 90 degrees. */
-.face.right {transform:rotateY(90deg) translateZ(55px)}  /* Rotated right 90 degrees. */
-.face.top   {transform:rotateX(90deg) translateZ(55px)}  /* Rotated up 90 degrees. */
-.face.bottom{transform:rotateX(-90deg) translateZ(55px)} /* Rotated down 90 degrees. */
+.face::before{
+  content:'';
+  position:absolute;
+  inset:8px;
+  border:1px solid rgba(167, 139, 250, 0.2);
+  border-radius:4px;
+  background:
+    linear-gradient(rgba(167, 139, 250, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(167, 139, 250, 0.06) 1px, transparent 1px);
+  background-size:14px 14px;
+  pointer-events:none;
+}
+
+.face.front{
+  transform:rotateY(0deg) translateZ(55px);
+  background:linear-gradient(145deg, rgba(167, 139, 250, 0.42), rgba(99, 102, 241, 0.22));
+}
+
+.face.back{
+  transform:rotateY(180deg) translateZ(55px);
+  background:linear-gradient(145deg, rgba(67, 56, 202, 0.35), rgba(30, 27, 75, 0.45));
+  border-color:rgba(109, 40, 217, 0.45);
+}
+
+.face.right{
+  transform:rotateY(90deg) translateZ(55px);
+  background:linear-gradient(160deg, rgba(124, 58, 237, 0.38), rgba(76, 29, 149, 0.28));
+}
+
+.face.left{
+  transform:rotateY(-90deg) translateZ(55px);
+  background:linear-gradient(200deg, rgba(91, 33, 182, 0.4), rgba(49, 46, 129, 0.32));
+}
+
+.face.top{
+  transform:rotateX(90deg) translateZ(55px);
+  background:linear-gradient(180deg, rgba(196, 181, 253, 0.35), rgba(139, 92, 246, 0.18));
+  border-color:rgba(221, 214, 254, 0.5);
+}
+
+.face.bottom{
+  transform:rotateX(-90deg) translateZ(55px);
+  background:linear-gradient(0deg, rgba(49, 46, 129, 0.5), rgba(30, 27, 75, 0.4));
+  border-color:rgba(79, 70, 229, 0.4);
+  box-shadow:inset 0 -8px 24px rgba(0, 0, 0, 0.35);
+}
 
 
 /* The floating tech label pills (React, Node.js, Tailwind etc.) around the cube. */
@@ -1390,6 +1460,13 @@ footer{
   filter:blur(0);
 }
 
+/* filter/transform on .reveal flatten CSS 3D — fade the hero scene with opacity only */
+.hero-scene.reveal,
+.hero-scene.reveal.visible{
+  transform:none;
+  filter:none;
+}
+
 
 /* -------------------------------------------
    PARTICLES
@@ -1521,7 +1598,7 @@ footer{
   }
 
   .cube, .face{width:90px;height:90px}
-  .face.front {transform:translateZ(45px)}
+  .face.front {transform:rotateY(0deg) translateZ(45px)}
   .face.back  {transform:rotateY(180deg) translateZ(45px)}
   .face.left  {transform:rotateY(-90deg) translateZ(45px)}
   .face.right {transform:rotateY(90deg) translateZ(45px)}
@@ -1561,7 +1638,7 @@ footer{
     transform:translateY(-6px) scale(1.01);
   }
 
-  .reveal{
+  .reveal:not(.hero-scene){
     filter:blur(3px);
     transform:translateY(20px) scale(0.99);
   }
