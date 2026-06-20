@@ -494,7 +494,7 @@ function initCardTilt() {
       card.style.transition = "transform 0.08s ease-out, box-shadow 0.08s ease-out";
       card.style.transform = `perspective(1000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
       
-      card.style.boxShadow = `0 15px 35px -5px rgba(168, 85, 247, 0.25)`;
+      card.style.boxShadow = `0 15px 35px -5px rgba(193, 18, 31, 0.28)`;
     });
     
     card.addEventListener("mouseleave", () => {
@@ -517,9 +517,163 @@ function initCardTilt() {
   });
 }
 
+/* -------------------------------------------
+   3D SITE BACKGROUND — FULL-SCREEN PLEXUS
+   This animates a beautiful, subtle 3D plexus background
+   across the entire website.
+   It reacts to mouse coordinates and scroll parallax.
+------------------------------------------- */
+function initSiteBg3D(prefersReducedMotion) {
+  const canvas = document.getElementById("bg-canvas3d");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  }
+  resize();
+  window.addEventListener("resize", resize, { passive: true });
+
+  if (prefersReducedMotion) return;
+
+  // Configuration
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
+  const particleCount = isMobile ? 35 : 75;
+  const lineDistance = 140;
+  const focalLength = 350;
+  const particles = [];
+
+  // Initialize particles in a large 3D space volume
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: (Math.random() - 0.5) * 1600,
+      y: (Math.random() - 0.5) * 1600,
+      z: Math.random() * 1000,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      vz: (Math.random() - 0.5) * 0.15
+    });
+  }
+
+  // Pointer & Scroll Tracking
+  let mouseX = 0, mouseY = 0;
+  let targetMouseX = 0, targetMouseY = 0;
+  let scrollY = 0;
+  let targetScrollY = 0;
+
+  window.addEventListener("pointermove", (e) => {
+    targetMouseX = e.clientX - width / 2;
+    targetMouseY = e.clientY - height / 2;
+  }, { passive: true });
+
+  window.addEventListener("scroll", () => {
+    targetScrollY = window.scrollY;
+  }, { passive: true });
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Smooth physics interpolation
+    mouseX += (targetMouseX - mouseX) * 0.05;
+    mouseY += (targetMouseY - mouseY) * 0.05;
+    scrollY += (targetScrollY - scrollY) * 0.05;
+
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Update positions and project
+    const projected = [];
+    for (let i = 0; i < particleCount; i++) {
+      const p = particles[i];
+
+      // Drift in 3D
+      p.x += p.vx;
+      p.y += p.vy;
+      p.z += p.vz;
+
+      // Boundary wrapping in 3D box
+      if (p.x < -800) p.x = 800;
+      if (p.x > 800) p.x = -800;
+      if (p.y < -800) p.y = 800;
+      if (p.y > 800) p.y = -800;
+      if (p.z < 0) p.z = 1000;
+      if (p.z > 1000) p.z = 0;
+
+      // Apply 3D Scroll Parallax
+      const scrollFactor = (1000 - p.z) / 1000;
+      const scrollOffset = scrollY * scrollFactor * 0.35;
+      const renderedY = p.y - scrollOffset;
+
+      // Apply 3D Mouse Parallax
+      const mouseFactor = (1000 - p.z) / 1000;
+      const renderedX = p.x - mouseX * mouseFactor * 0.18;
+      const finalY = renderedY - mouseY * mouseFactor * 0.18;
+
+      // Project onto 2D screen
+      const scale = focalLength / (focalLength + p.z);
+      const projX = renderedX * scale + centerX;
+      const projY = finalY * scale + centerY;
+
+      projected.push({
+        x: projX,
+        y: projY,
+        z: p.z,
+        scale: scale,
+        orig: p
+      });
+    }
+
+    // Draw Plexus lines in 3D space
+    for (let i = 0; i < particleCount; i++) {
+      const p1 = projected[i];
+      
+      // Draw particle dot
+      if (p1.x > -50 && p1.x < width + 50 && p1.y > -50 && p1.y < height + 50) {
+        const size = Math.max(0.4, 2.2 * p1.scale);
+        const alpha = (1 - p1.z / 1000) * 0.28;
+        
+        ctx.fillStyle = `rgba(193, 18, 31, ${alpha.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(p1.x, p1.y, size, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Connect lines
+        for (let j = i + 1; j < particleCount; j++) {
+          const p2 = projected[j];
+          
+          const dx = p1.orig.x - p2.orig.x;
+          const dy = p1.orig.y - p2.orig.y;
+          const dz = p1.orig.z - p2.orig.z;
+          const dist3D = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+          if (dist3D < lineDistance) {
+            const opacity = (1 - dist3D / lineDistance) * 0.11 * Math.min(1 - p1.z / 1000, 1 - p2.z / 1000);
+            ctx.strokeStyle = `rgba(193, 18, 31, ${opacity.toFixed(3)})`;
+            ctx.lineWidth = 0.45;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+
 // Run canvas and tilt animations
 init3DCanvas(prefersReducedMotion);
 initCardTilt();
+initSiteBg3D(prefersReducedMotion);
 
 
 /* -------------------------------------------

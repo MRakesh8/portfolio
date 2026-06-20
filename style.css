@@ -218,13 +218,13 @@ body::after{
   padding:5px 14px;
   border-radius:999px;
   margin-bottom:1.25rem;
-  box-shadow: 0 0 24px rgba(139, 92, 246, 0.12);
+  box-shadow: 0 0 24px rgba(193, 18, 31, 0.14);
   animation: chipGlow 4s ease-in-out infinite;
 }
 
 @keyframes chipGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.1); border-color: var(--blue-border); }
-  50%      { box-shadow: 0 0 28px rgba(139, 92, 246, 0.22); border-color: rgba(139, 92, 246, 0.35); }
+  0%, 100% { box-shadow: 0 0 20px rgba(193, 18, 31, 0.1); border-color: var(--blue-border); }
+  50%      { box-shadow: 0 0 28px rgba(193, 18, 31, 0.22); border-color: rgba(193, 18, 31, 0.35); }
 }
 
 
@@ -301,7 +301,7 @@ body::after{
 .card:hover{
   border-color:var(--blue-border-strong);
   transform:translateY(-10px) scale(1.02);
-  box-shadow:0 20px 50px -12px rgba(139, 92, 246, 0.35),
+  box-shadow:0 20px 50px -12px rgba(193, 18, 31, 0.28),
              inset 0 0 24px rgba(255,255,255,0.04);
   z-index: 10;
 }
@@ -347,7 +347,7 @@ body::after{
 
 /* The filled purple gradient button (e.g., "Let's Build Together"). */
 .btn-primary{
-  background:linear-gradient(135deg, #4f46e5, #9333ea); /* Diagonal gradient from indigo to purple. */
+  background:linear-gradient(135deg, var(--blue), var(--blue-light)); /* Diagonal gradient using brand Crimson */
   border:1px solid rgba(255,255,255,0.15); /* Subtle white border. */
   color:#fff;               /* White text. */
   position:relative;        /* Needed for the ::after hover overlay to work. */
@@ -360,7 +360,7 @@ body::after{
   position:absolute;inset:0;                          /* Covers the entire button. */
   z-index:0;                                           /* Keeps overlay below the text/icon. */
   pointer-events:none;                                 /* Prevents overlay from blocking taps/clicks. */
-  background:linear-gradient(135deg, #6366f1, #a855f7); /* A lighter, brighter gradient. */
+  background:linear-gradient(135deg, var(--blue-light), #ff4a58); /* A lighter, brighter crimson gradient. */
   opacity:0;                                           /* Hidden by default. */
   transition:opacity 0.4s ease;                       /* Fades in when hovered. */
 }
@@ -368,8 +368,8 @@ body::after{
 /* On hover: the brighter overlay fades in. */
 .btn-primary:hover::after{opacity:1}
 
-/* On hover: button also gets a purple glow and lifts up slightly. */
-.btn-primary:hover{box-shadow:0 0 30px rgba(147, 51, 234, 0.5);transform:translateY(-4px) scale(1.02)}
+/* On hover: button also gets a crimson glow and lifts up slightly. */
+.btn-primary:hover{box-shadow:0 0 30px rgba(193, 18, 31, 0.45);transform:translateY(-4px) scale(1.02)}
 
 /* All direct children of .btn-primary appear above the ::after overlay layer. */
 .btn-primary>*{position:relative;z-index:1}
@@ -896,6 +896,9 @@ body::after{
 
 /* Inner padding for each service card. */
 .service-card{
+  display:flex;
+  flex-direction:column;
+  height:100%;
   /* clamp scales padding between 1.5rem and 2rem based on viewport. */
   padding:clamp(1.5rem,3vw,2rem);
 }
@@ -932,7 +935,7 @@ body::after{
 }
 
 /* The list of bullet points inside each service card. */
-.service-list{display:flex;flex-direction:column;gap:6px} /* Vertical list with 6px gaps. */
+.service-list{display:flex;flex-direction:column;gap:6px;margin-top:auto} /* Vertical list with 6px gaps. */
 
 /* Each bullet point item. */
 .service-list li{
@@ -1747,55 +1750,107 @@ footer{
 /* Certifications Section */
 .certifications-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin-top: 3rem;
 }
 
 .cert-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1.25rem;
-  padding: 1.5rem;
+  padding: 1.75rem 1.5rem;
   border-radius: var(--radius-md);
   transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+  height: 100%;
 }
 
 .cert-icon {
   width: 44px;
   height: 44px;
   border-radius: var(--radius-sm);
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border-strong);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--blue-light, #a78bfa);
+  color: var(--text-primary);
   flex-shrink: 0;
 }
 
 .cert-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
+  width: 100%;
 }
 
 .cert-title {
   font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #ffffff;
+  line-height: 1.35;
 }
 
 .cert-issuer {
   font-size: 0.85rem;
   color: var(--text-muted);
+  font-weight: 500;
+}
+
+.cert-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin-top: 0.15rem;
+}
+
+.cert-date {
+  display: inline-flex;
+  align-items: center;
+}
+
+.cert-id {
+  font-family: var(--font-body);
+  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--blue-border);
+}
+
+.cert-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0.75rem;
+}
+
+.cert-skill-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border-strong);
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  transition: all var(--transition);
+}
+
+.cert-card:hover .cert-skill-tag {
+  background: rgba(193, 18, 31, 0.35);
+  border-color: var(--blue-light);
+  color: #ffffff;
 }
 
 /* Responsiveness for Certifications Grid */
 @media (max-width: 1024px) {
   .certifications-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 

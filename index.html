@@ -105,8 +105,11 @@
 
 </head>
 <body>
-<!-- body contains ALL the visible content on the page:
-     navbar, hero, services, projects, skills, contact, and footer. -->
+  <!-- Full-screen 3D Background Canvas -->
+  <canvas id="bg-canvas3d" style="position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none;"></canvas>
+
+  <!-- body contains ALL the visible content on the page:
+       navbar, hero, services, projects, skills, contact, and footer. -->
 
 
 <!-- -------------------------------------------
@@ -365,16 +368,10 @@
           <polygon points="12 2 2 7 12 12 22 7 12 2"/>
           <polyline points="2 17 12 22 22 17"/>
           <polyline points="2 12 12 17 22 12"/>
-          <!-- Three SVG shapes that together draw a "layers" stacked box icon. -->
-        </svg>
-        What I Do
-      </div>
-
-      <h2 class="section-title">Services Built for <span class="gradient-text">Real Results</span></h2>
+          <!-- T      <h2 class="section-title">Services Built for <span class="gradient-text">Real Results</span></h2>
       <!-- h2 is a second-level heading (below h1). Used for section titles throughout the page. -->
 
-      <p class="section-subtitle">From pixel-perfect frontend interfaces to fully deployed applications &mdash; I handle the full spectrum so you don't have to.</p>
-      <!-- &mdash; is the HTML entity for an em dash: â€” -->
+      <p class="section-subtitle">From responsive frontend interfaces to full-stack application logic and intelligent AI integrations.</p>
 
     </div>
 
@@ -387,7 +384,7 @@
            service-card = adds padding inside the card.
            d1 = animates in with a 0.08s delay. -->
         <div class="service-icon" aria-hidden="true">
-        <!-- The icon box â€” styled as a small rounded square with a purple tint. -->
+        <!-- The icon box — styled as a small rounded square with a purple tint. -->
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <rect x="2" y="3" width="20" height="14" rx="2"/>
             <line x1="8" y1="21" x2="16" y2="21"/>
@@ -395,9 +392,9 @@
             <!-- A monitor/screen icon: rectangle screen + stand lines. -->
           </svg>
         </div>
-        <h3 class="service-title">Premium Frontend Engineering</h3>
+        <h3 class="service-title">Modern Frontend Engineering</h3>
         <!-- h3 = third-level heading. Used for card titles. -->
-        <p class="service-desc">Responsive, pixel-perfect, interactive UIs built with modern standards. Every component is crafted for performance, accessibility, and visual delight.</p>
+        <p class="service-desc">Building responsive, high-performance, and visually stunning web interfaces. Combining pixel-perfect styling with clean React and Next.js component design for optimal user experience.</p>
         <ul class="service-list">
         <!-- ul = unordered list. Each li is a bullet point feature. -->
           <li>
@@ -405,18 +402,17 @@
             <!-- check class makes the checkmark icon purple. -->
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
               <!-- A checkmark (tick) icon. -->
-            </span>Responsive across all devices</li>
+            </span>React, Next.js, and Tailwind CSS</li>
           <li><span class="check" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </span>React / Tailwind / Vanilla JS</li>
+            </span>Mobile-First Responsive Layouts</li>
           <li><span class="check" aria-hidden="true">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </span>Micro-animations &amp; interactions</li>
-            <!-- &amp; is the HTML entity for the ampersand character: & -->
+            </span>Interactive & Accessible Components</li>
         </ul>
       </div>
 
-      <!-- Service Card 2: Full-Stack Web Applications (featured card with top gradient border) -->
+      <!-- Service Card 2: Full-Stack Web Development -->
       <div class="card card-highlight service-card reveal d2" style="border-color:rgba(96,165,250,0.25)">
       <!-- card-highlight adds the glowing top border line.
            The inline style overrides the default border color with a blue tint. -->
@@ -431,30 +427,33 @@
             <!-- A lightning bolt / zap icon representing speed and power. -->
           </svg>
         </div>
-        <h3 class="service-title">Full-Stack Web Applications</h3>
-        <p class="service-desc">End-to-end development from database schema to cloud deployment. Robust systems that handle real users and real data seamlessly.</p>
+        <h3 class="service-title">Full-Stack Web Development</h3>
+        <p class="service-desc">Developing secure, end-to-end web applications with reliable server-side logic. Integrating custom database schemas, API routing, and data flow to support robust client systems.</p>
         <ul class="service-list">
-          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>API design &amp; database architecture</li>
-          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Vercel / Netlify / Railway deployment</li>
-          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Authentication, payments, and admin dashboards</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Node.js & Express.js REST APIs</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>PostgreSQL & Supabase Integration</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Deployments via Vercel & Render</li>
         </ul>
       </div>
 
-      <!-- Service Card 3: Mobile App Ecosystems -->
+      <!-- Service Card 3: AI Chatbot Development -->
       <div class="card service-card reveal d3">
         <div class="service-icon" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <rect x="5" y="2" width="14" height="20" rx="2"/>
-            <circle cx="12" cy="17" r="1" fill="currentColor"/>
-            <!-- A smartphone icon: tall rectangle with a small circle for the home button. -->
+            <rect x="3" y="11" width="18" height="10" rx="2"/>
+            <circle cx="12" cy="5" r="2"/>
+            <path d="M12 7v4"/>
+            <line x1="8" y1="16" x2="8.01" y2="16"/>
+            <line x1="16" y1="16" x2="16.01" y2="16"/>
+            <!-- A bot/robot icon. -->
           </svg>
         </div>
-        <h3 class="service-title">Mobile App Ecosystems</h3>
-        <p class="service-desc">Native Android apps built with Kotlin, paired with cross-platform strategy. Mobile-first thinking that puts your product in pockets worldwide.</p>
+        <h3 class="service-title">AI Chatbot Development</h3>
+        <p class="service-desc">Integrating intelligent conversational features and Gemini AI capabilities. Engineering semantic search pipelines, robust knowledge base systems, and custom chatbot interfaces.</p>
         <ul class="service-list">
-          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Native Android (Kotlin)</li>
-          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Mobile-first UI strategy</li>
-          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Cross-platform consultation</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Gemini AI & API Integrations</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>RAG-based Search Systems</li>
+          <li><span class="check" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span>Conversational User Interfaces</li>
         </ul>
       </div>
 
@@ -832,58 +831,170 @@
     </div>
 
     <div class="certifications-grid">
-      <!-- Cert 1 -->
+      <!-- Cert 1: Python Spoken Tutorial -->
       <div class="card cert-card reveal d1">
         <div class="cert-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
         </div>
         <div class="cert-info">
-          <h3 class="cert-title">Advanced Python Development</h3>
-          <p class="cert-issuer">LinkedIn Verified</p>
+          <h3 class="cert-title">Python Programming</h3>
+          <p class="cert-issuer">Spoken Tutorial, IIT Bombay</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued Nov 2025</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">Python</span>
+          </div>
         </div>
       </div>
 
-      <!-- Cert 2 -->
+      <!-- Cert 2: Java NPTEL -->
       <div class="card cert-card reveal d2">
         <div class="cert-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/>
+            <line x1="10" y1="1" x2="10" y2="4"/>
+            <line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
         </div>
         <div class="cert-info">
-          <h3 class="cert-title">C++ Systems Programming</h3>
-          <p class="cert-issuer">LinkedIn Verified</p>
+          <h3 class="cert-title">Programming in Java</h3>
+          <p class="cert-issuer">NPTEL</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued Nov 2025</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">Java</span>
+          </div>
         </div>
       </div>
 
-      <!-- Cert 3 -->
+      <!-- Cert 3: UI/UX Designing using ChatGPT -->
       <div class="card cert-card reveal d3">
         <div class="cert-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
         </div>
         <div class="cert-info">
-          <h3 class="cert-title">Enterprise Java Programming</h3>
-          <p class="cert-issuer">LinkedIn Verified</p>
+          <h3 class="cert-title">UI/UX Designing using ChatGPT</h3>
+          <p class="cert-issuer">Simplilearn</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued Aug 2025</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">User Interface Design</span>
+            <span class="cert-skill-tag">User Experience (UX)</span>
+          </div>
         </div>
       </div>
 
-      <!-- Cert 4 -->
+      <!-- Cert 4: Introduction to Generative AI Studio -->
       <div class="card cert-card reveal d1">
         <div class="cert-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.813 15.904L9 21L8.188 15.904L3 15L8.188 14.096L9 9L9.813 14.096L15 15L9.813 15.904Z"/>
+            <path d="M19.071 4.929a10 10 0 0 0-14.142 0M21 12a9 9 0 0 1-9 9"/>
+          </svg>
         </div>
         <div class="cert-info">
-          <h3 class="cert-title">User Experience Design & Generative AI Studio</h3>
-          <p class="cert-issuer">LinkedIn Verified</p>
+          <h3 class="cert-title">Introduction to Generative AI Studio</h3>
+          <p class="cert-issuer">Simplilearn</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued Aug 2025</span>
+            <span class="cert-id">ID: 8750827</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">Generative AI Studio</span>
+          </div>
         </div>
       </div>
 
-      <!-- Cert 5 -->
+      <!-- Cert 5: AI Agent for Beginners -->
       <div class="card cert-card reveal d2">
         <div class="cert-icon" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2"/>
+            <circle cx="12" cy="5" r="2"/>
+            <path d="M12 7v4"/>
+            <line x1="8" y1="16" x2="8.01" y2="16"/>
+            <line x1="16" y1="16" x2="16.01" y2="16"/>
+          </svg>
         </div>
         <div class="cert-info">
-          <h3 class="cert-title">Low-Level C Systems Programming</h3>
-          <p class="cert-issuer">LinkedIn Verified</p>
+          <h3 class="cert-title">AI Agent for Beginners</h3>
+          <p class="cert-issuer">Simplilearn</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued Aug 2025</span>
+            <span class="cert-id">ID: 8750061</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">Artificial Intelligence (AI)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cert 6: C++ Spoken Tutorial -->
+      <div class="card cert-card reveal d3">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">C++ Programming</h3>
+          <p class="cert-issuer">Spoken Tutorial, IIT Bombay</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued May 2025</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">C++</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cert 7: C language Spoken Tutorial -->
+      <div class="card cert-card reveal d1">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">C Programming</h3>
+          <p class="cert-issuer">Spoken Tutorial, IIT Bombay</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued May 2025</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">C</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cert 8: Python VEI Technologies -->
+      <div class="card cert-card reveal d2">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">Python Development</h3>
+          <p class="cert-issuer">VEI Technologies Inc.</p>
+          <div class="cert-meta">
+            <span class="cert-date">Issued Feb 2025</span>
+          </div>
+          <div class="cert-skills">
+            <span class="cert-skill-tag">Python</span>
+          </div>
         </div>
       </div>
     </div>
