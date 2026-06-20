@@ -27,6 +27,10 @@ html {
   width: 100%;               /* The html element fills the full browser width. */
   min-height: 100%;          /* The html element is at least as tall as the browser window. */
   overflow-x: clip;          /* Hides anything that goes off the right/left edge (prevents horizontal scroll). */
+  background-color: var(--bg-base);  /* Uses the --bg-base color variable defined below (pure black). */
+  background-image: radial-gradient(circle at top right, rgba(193, 18, 31, 0.12), transparent 45%),
+                    radial-gradient(circle at bottom left, rgba(0, 47, 73, 0.18), transparent 45%);
+  background-attachment: fixed;     /* The background gradient stays fixed when you scroll (parallax feel). */
 }
 
 /* body is where all the visible content lives. */
@@ -35,15 +39,7 @@ body {
   min-width: 0;              /* Prevents the body from being forced wider than its container. */
   margin: 0;                 /* No outer spacing around the body. */
   padding: 0;                /* No inner spacing inside the body. */
-  background-color: var(--bg-base);  /* Uses the --bg-base color variable defined below (pure black). */
-
-  /* Two soft glowing circles painted on the background:
-     One purple at the top-right, one pink at the bottom-left.
-     rgba(r,g,b,a) â€” the last number is opacity (0=invisible, 1=solid). */
-  background-image: radial-gradient(circle at top right, rgba(193, 18, 31, 0.12), transparent 45%),
-                    radial-gradient(circle at bottom left, rgba(0, 47, 73, 0.18), transparent 45%);
-
-  background-attachment: fixed;     /* The background gradient stays fixed when you scroll (parallax feel). */
+  background: transparent !important; /* Made transparent to allow the 3D background canvas to show through */
   color: var(--text-primary);       /* Default text color for the whole page (light grey/white). */
   font-family: 'DM Sans', sans-serif; /* Default font. 'DM Sans' loads from Google Fonts. */
   overflow-x: hidden;
@@ -398,151 +394,213 @@ body::after{
    The fixed top navigation bar.
 ------------------------------------------- */
 
-/* The navigation bar â€” always visible at the top of the screen. */
-#navbar{
-  position:fixed;          /* Stays at the top even when the user scrolls. */
-  top:0;left:0;right:0;   /* Stretches across the full width of the screen. */
-  z-index:100;             /* Sits in front of ALL other page content. */
-  background:rgba(3,7,18,0.7); /* Dark navy, 70% opaque. */
-  backdrop-filter:blur(20px);        /* Blurs the page content behind the navbar. */
-  -webkit-backdrop-filter:blur(20px); /* Safari version. */
-  border-bottom:1px solid rgba(255,255,255,0.05); /* Very faint bottom border line. */
-  transition:background var(--transition); /* Smooth background change when scrolling. */
+#navbar {
+  position: fixed;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2.5rem);
+  max-width: 1200px;
+  z-index: 100;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* When the user scrolls down, the navbar becomes more opaque (added by JavaScript). */
-#navbar.scrolled{background:rgba(3,7,18,0.95)}
+#navbar.scrolled {
+  top: 0.75rem;
+  background: transparent;
+}
 
-/* The inner row that holds the logo and nav links. */
-.nav-inner{
-  width:100%;             /* Full width. */
-  max-width:none;         /* No max-width limit. */
-  margin-inline:0;        /* No horizontal centering margin. */
-  padding-inline:clamp(1rem,4vw,5rem); /* Responsive horizontal padding. */
-  height:64px;            /* Fixed 64px tall. */
-  display:flex;           /* Puts logo and links side by side. */
-  align-items:center;     /* Vertically centers the logo and links. */
-  justify-content:space-between; /* Logo on the left, links on the right. */
+.nav-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 0.65rem 1.75rem;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 20, 32, 0.45);
+  border: 1px solid rgba(254, 240, 213, 0.08);
+  border-radius: 100px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#navbar.scrolled .nav-inner {
+  background: rgba(0, 15, 25, 0.75);
+  border-color: rgba(193, 18, 31, 0.22);
+  box-shadow: 0 12px 30px -10px rgba(193, 18, 31, 0.25), 
+              0 0 20px rgba(193, 18, 31, 0.15);
+  padding: 0.5rem 1.5rem;
 }
 
 /* The brand name in the top-left corner. */
-.nav-logo{
-  font-family:var(--font-display); /* Heading font. */
-  font-weight:800;        /* Extra bold. */
-  font-size:1.2rem;       /* Slightly larger than body text. */
-  color:#fff;             /* White. */
-  letter-spacing:-0.02em; /* Slightly tighter letter spacing. */
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #fff;
+  letter-spacing: -0.02em;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* A second color applied to a <span> inside the logo. */
-.nav-logo span{color:#4a5568}
+.nav-logo:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.nav-logo span {
+  color: #4a5568;
+}
 
 /* The row of navigation links on the right. */
-.nav-links{
-  display:flex;           /* Side by side. */
-  align-items:center;     /* Vertically centered. */
-  gap:2rem;               /* 2rem space between each link. */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* Individual navigation links. */
-.nav-links a{
-  position:relative;
-  color:var(--text-muted);
-  font-size:0.9rem;
-  font-weight:500;
-  transition:color var(--transition);
+.nav-links a {
+  padding: 8px 18px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.nav-links a:not(.btn)::after{
-  content:'';
-  position:absolute;
-  left:0;
-  bottom:-4px;
-  width:100%;
-  height:2px;
-  background:linear-gradient(90deg, var(--blue), var(--blue-light));
-  transform:scaleX(0);
-  transform-origin:left;
-  transition:transform 0.35s var(--ease-out-expo);
-  border-radius:2px;
+.nav-links a:hover {
+  color: #ffffff;
+  background: rgba(193, 18, 31, 0.08);
+  border-color: rgba(193, 18, 31, 0.15);
 }
 
-.nav-links a:not(.btn):hover::after{
-  transform:scaleX(1);
+.nav-links a.active {
+  color: #ffffff;
+  background: rgba(193, 18, 31, 0.12);
+  border-color: rgba(193, 18, 31, 0.25);
+  box-shadow: 0 0 15px rgba(193, 18, 31, 0.15);
 }
 
-.nav-links a:hover{color:var(--blue-light)}
-
-/* The "Let's Talk" button in the navbar â€” slightly smaller than standard buttons. */
-.nav-cta{padding:0.5rem 1.2rem;font-size:0.85rem}
-
-
-/* Hamburger menu button â€” only visible on mobile screens. */
-#menu-btn{
-  display:none;           /* Hidden by default (shown on mobile via media query). */
-  flex-direction:column;  /* Three bars stacked vertically. */
-  gap:5px;                /* Space between each bar. */
-  padding:6px;            /* Clickable area padding. */
-  background:none;        /* No background. */
-  border:none;            /* No border. */
+/* The "Let's Talk" button in the navbar */
+.nav-cta {
+  border-radius: 100px !important;
+  padding: 8px 22px !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 4px 15px rgba(193, 18, 31, 0.3) !important;
+  border: 1px solid rgba(254, 240, 213, 0.1) !important;
 }
 
-/* Each bar of the hamburger icon. */
-#menu-btn span{
-  display:block;          /* Each bar is a block element. */
-  width:22px;height:2px;  /* 22px wide, 2px tall â€” a thin line. */
-  background:var(--text-muted); /* Grey colored bars. */
-  border-radius:2px;      /* Slightly rounded ends. */
-  transition:all 0.3s ease; /* Smooth animation when transforming to X. */
-  transform-origin:center;  /* Rotates from the center of each bar. */
+.nav-cta:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(193, 18, 31, 0.45),
+              0 0 15px rgba(193, 18, 31, 0.2) !important;
+  border-color: rgba(254, 240, 213, 0.25) !important;
 }
 
-/* When the menu is open, the first bar rotates down to form the top of an X. */
-#menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-
-/* The middle bar fades and shrinks away. */
-#menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
-
-/* The third bar rotates up to form the bottom of an X. */
-#menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-
-
-/* The dropdown mobile navigation menu. */
-#mobile-nav{
-  display:none;           /* Hidden by default. */
-  flex-direction:column;  /* Links stacked vertically. */
-  gap:0;                  /* No extra space between links (each link has its own padding). */
-  border-top:1px solid rgba(255,255,255,0.05); /* Faint separator above the menu. */
-  padding:1rem clamp(1rem,5vw,2.5rem) 1.25rem; /* Inner spacing. */
-  background:rgba(3,7,18,0.97); /* Almost fully opaque dark background. */
+#menu-btn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* When JavaScript adds the "open" class, the menu becomes visible. */
-#mobile-nav.open{
-  display:flex;
-  animation:mobileNavIn 0.35s var(--ease-out-expo) forwards;
+#menu-btn:hover {
+  background: rgba(193, 18, 31, 0.1);
+  border-color: rgba(193, 18, 31, 0.25);
 }
 
-@keyframes mobileNavIn{
-  from{opacity:0;transform:translateY(-8px)}
-  to{opacity:1;transform:translateY(0)}
+#menu-btn span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background-color: var(--text-muted);
+  border-radius: 2px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
 }
 
-/* Individual links inside the mobile menu. */
-#mobile-nav a{
-  color:var(--text-muted); /* Grey text. */
-  font-size:0.95rem;       /* Comfortable reading size. */
-  font-weight:500;         /* Medium weight. */
-  padding:0.6rem 0;        /* Top/bottom padding for easy tapping. */
-  border-bottom:1px solid rgba(255,255,255,0.04); /* Very faint separator between links. */
-  transition:color var(--transition); /* Smooth color change on hover. */
+#menu-btn.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
 }
 
-/* The last link has no bottom border, and gets a small top margin. */
-#mobile-nav a:last-child{border-bottom:none;margin-top:0.5rem}
+#menu-btn.open span:nth-child(2) {
+  opacity: 0;
+  transform: scale(0);
+}
 
-/* Links turn light purple on hover. */
-#mobile-nav a:hover{color:var(--blue-light)}
+#menu-btn.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+#mobile-nav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin-top: 0.5rem;
+  background: rgba(0, 15, 25, 0.95);
+  border: 1px solid rgba(193, 18, 31, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 2rem 1.5rem;
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 
+              0 0 30px rgba(193, 18, 31, 0.15);
+  border-top: none;
+}
+
+#mobile-nav.open {
+  display: flex;
+  animation: mobileNavIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes mobileNavIn {
+  from { opacity: 0; transform: translateY(-15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#mobile-nav a {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  padding: 0.75rem 1.25rem;
+  border-radius: 100px;
+  border: 1px solid transparent;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-bottom: none;
+}
+
+#mobile-nav a:last-child {
+  margin-top: 0;
+}
+
+#mobile-nav a:hover {
+  color: #ffffff;
+  background: rgba(193, 18, 31, 0.1);
+  border-color: rgba(193, 18, 31, 0.2);
+}
 
 
 /* -------------------------------------------
@@ -1453,9 +1511,6 @@ footer{
   }
 
   .card,
-  #navbar,
-  #navbar.scrolled,
-  #mobile-nav,
   .badge,
   .hero-stats-bar,
   .float-tag{
@@ -1465,15 +1520,6 @@ footer{
 
   .card{
     background:linear-gradient(145deg, rgba(30,41,59,0.94), rgba(15,23,42,0.98));
-  }
-
-  #navbar,
-  #navbar.scrolled{
-    background:rgba(3,7,18,0.97);
-  }
-
-  #mobile-nav{
-    background:rgba(3,7,18,0.98);
   }
 
   .hero-stats-bar{
@@ -1491,19 +1537,17 @@ footer{
   .nav-links{display:none}
   #menu-btn{
     display:flex;
-    min-width:44px;
-    min-height:44px;
-    align-items:center;
-    justify-content:center;
   }
 
   #navbar{
-    padding-top:env(safe-area-inset-top, 0);
+    top: 0.75rem;
+    width: calc(100% - 1.5rem);
+    padding-top: 0;
   }
 
   .nav-inner{
-    height:56px;
-    padding-inline:max(1rem, env(safe-area-inset-left, 0)) max(1rem, env(safe-area-inset-right, 0));
+    height: auto;
+    padding: 0.5rem 1.25rem;
   }
 
   #hero{
