@@ -1,4 +1,4 @@
-﻿# Rakesh Portfolio
+# Rakesh Portfolio
 
 A modern personal portfolio website built to showcase projects, skills, and freelance web development services.
 
@@ -9,7 +9,7 @@ This portfolio presents a clean landing page with service highlights, featured w
 ## Features
 
 - Responsive layout for desktop, tablet, and mobile screens
-- Animated hero section with interactive cube movement
+- Interactive 3D Particle Plexus scene with mouse/touch drag capture and magnetic hover attraction
 - Smooth scrolling navigation
 - Scroll reveal animations
 - Project showcase cards
