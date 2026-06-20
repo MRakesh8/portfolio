@@ -316,27 +316,32 @@ function init3DCanvas(prefersReducedMotion) {
   resize();
   window.addEventListener("resize", resize);
 
-  const particleCount = 65;
-  const sphereRadius = 110;
+  const cols = 13;
+  const rows = 13;
+  const spacingX = 26;
+  const spacingZ = 26;
+  const maxRadius = 230;
   const particles = [];
   
-  for (let i = 0; i < particleCount; i++) {
-    const phi = Math.acos(-1 + (2 * i) / particleCount);
-    const theta = Math.sqrt(particleCount * Math.PI) * phi;
-    particles.push({
-      x: sphereRadius * Math.cos(theta) * Math.sin(phi),
-      y: sphereRadius * Math.sin(theta) * Math.sin(phi),
-      z: sphereRadius * Math.cos(phi),
-      baseX: sphereRadius * Math.cos(theta) * Math.sin(phi),
-      baseY: sphereRadius * Math.sin(theta) * Math.sin(phi),
-      baseZ: sphereRadius * Math.cos(phi)
-    });
+  for (let c = 0; c < cols; c++) {
+    const baseX = (c - (cols - 1) / 2) * spacingX;
+    for (let r = 0; r < rows; r++) {
+      const baseZ = (r - (rows - 1) / 2) * spacingZ;
+      particles.push({
+        x: baseX,
+        y: 0,
+        z: baseZ,
+        baseX: baseX,
+        baseY: 0,
+        baseZ: baseZ
+      });
+    }
   }
 
-  let rotX = -0.5;
-  let rotY = 0.8;
-  let targetRotX = -0.5;
-  let targetRotY = 0.8;
+  let rotX = -0.6;
+  let rotY = 0.5;
+  let targetRotX = -0.6;
+  let targetRotY = 0.5;
   
   let mouse = { x: 0, y: 0, active: false };
   let isDragging = false;
@@ -384,10 +389,11 @@ function init3DCanvas(prefersReducedMotion) {
   function animate(timestamp) {
     ctx.clearRect(0, 0, width, height);
 
+    const t = timestamp / 1000;
+
     if (!isDragging && !prefersReducedMotion) {
-      const t = timestamp / 1000;
-      targetRotY += 0.0015;
-      targetRotX = -0.4 + Math.sin(t * 0.2) * 0.15;
+      targetRotY += 0.0012;
+      targetRotX = -0.55 + Math.sin(t * 0.15) * 0.08;
     }
 
     rotX += (targetRotX - rotX) * 0.1;
@@ -397,6 +403,23 @@ function init3DCanvas(prefersReducedMotion) {
     const sinX = Math.sin(rotX);
     const cosY = Math.cos(rotY);
     const sinY = Math.sin(rotY);
+
+    // Update wave heights
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      const dFromCenter = Math.sqrt(p.baseX * p.baseX + p.baseZ * p.baseZ);
+      let waveY = Math.sin(dFromCenter * 0.035 - t * 2.2) * 15;
+
+      if (mouse.active && !prefersReducedMotion) {
+        const dx = p.baseX - mouse.x * 0.85;
+        const dz = p.baseZ - mouse.y * 0.85;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < 100) {
+          waveY += Math.cos(dist * 0.08 - t * 4) * ((100 - dist) / 100) * 22;
+        }
+      }
+      p.y = waveY;
+    }
 
     const projected = [];
     const focalLength = 320;
@@ -412,20 +435,6 @@ function init3DCanvas(prefersReducedMotion) {
       let y2 = p.y * cosX - z1 * sinX;
       let z2 = p.y * sinX + z1 * cosX;
 
-      if (mouse.active && !prefersReducedMotion) {
-        const scale = focalLength / (focalLength + z2);
-        const scrX = x1 * scale;
-        const scrY = y2 * scale;
-        const dx = mouse.x - scrX;
-        const dy = mouse.y - scrY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 110) {
-          const force = ((110 - dist) / 110) * 8;
-          x1 += (dx / dist) * force;
-          y2 += (dy / dist) * force;
-        }
-      }
-
       const scale = focalLength / (focalLength + z2);
       const projX = x1 * scale + centerX;
       const projY = y2 * scale + centerY;
@@ -433,39 +442,58 @@ function init3DCanvas(prefersReducedMotion) {
       projected.push({ x: projX, y: projY, z: z2 });
     }
 
-    for (let i = 0; i < projected.length; i++) {
-      for (let j = i + 1; j < projected.length; j++) {
-        const p1 = projected[i];
-        const p2 = projected[j];
-        
-        const dx = p1.x - p2.x;
-        const dy = p1.y - p2.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+    // Render grid lines (connections between column and row neighbors)
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < rows; r++) {
+        const idx1 = c * rows + r;
+        const p1 = projected[idx1];
 
-        if (dist < 80) {
-          const alpha = (1 - dist / 80) * 0.18 * (1 - (p1.z + p2.z) / (2 * sphereRadius));
-          ctx.strokeStyle = `rgba(193, 18, 31, ${alpha.toFixed(3)})`;
-          ctx.lineWidth = 0.8;
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
+        // Connect to right neighbor
+        if (c < cols - 1) {
+          const idx2 = (c + 1) * rows + r;
+          const p2 = projected[idx2];
+          drawGridLine(p1, p2);
+        }
+
+        // Connect to bottom neighbor
+        if (r < rows - 1) {
+          const idx2 = c * rows + (r + 1);
+          const p2 = projected[idx2];
+          drawGridLine(p1, p2);
         }
       }
     }
 
+    function drawGridLine(p1, p2) {
+      const dx = p1.x - p2.x;
+      const dy = p1.y - p2.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 90) {
+        const avgZ = (p1.z + p2.z) / 2;
+        const alpha = (1 - dist / 90) * 0.13 * (1 - avgZ / (maxRadius * 1.5));
+        ctx.strokeStyle = `rgba(193, 18, 31, ${Math.max(0, alpha).toFixed(3)})`;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
+    }
+
+    // Render particles (dots)
     for (let i = 0; i < projected.length; i++) {
       const p = projected[i];
-      const alpha = (1 - p.z / (sphereRadius * 1.5)) * 0.65;
-      const size = (1 - p.z / sphereRadius) * 2 + 1.5;
+      const alpha = (1 - p.z / (maxRadius * 1.5)) * 0.65;
+      const size = (1 - p.z / maxRadius) * 1.4 + 1.2;
 
       const color = p.z < 0 
-        ? `rgba(193, 18, 31, ${alpha.toFixed(3)})` 
-        : `rgba(254, 240, 213, ${alpha.toFixed(3)})`;
+        ? `rgba(193, 18, 31, ${Math.max(0, alpha).toFixed(3)})` 
+        : `rgba(254, 240, 213, ${Math.max(0, alpha).toFixed(3)})`;
 
       ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, Math.max(0.5, size), 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, Math.max(0.4, size), 0, Math.PI * 2);
       ctx.fill();
     }
 

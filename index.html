@@ -46,15 +46,15 @@
      This blocks almost all XSS (Cross-Site Scripting) injection attacks. -->
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+  style-src   'self' 'unsafe-inline' https://fonts.googleapis.com https://chatbot-rakesh.vercel.app;
   font-src    https://fonts.gstatic.com;
-  script-src  'self' 'unsafe-inline';
-  img-src     'self' data: blob:;
-  connect-src 'none';
-  frame-src   'none';
+  script-src  'self' 'unsafe-inline' https://chatbot-rakesh.vercel.app;
+  img-src     'self' data: blob: https://chatbot-rakesh.vercel.app;
+  connect-src 'self' https://chat-bot-api-ns81.onrender.com https://chatbot-rakesh.vercel.app;
+  frame-src   'self' https://chatbot-rakesh.vercel.app;
   object-src  'none';
   base-uri    'self';
-  form-action 'none';
+  form-action 'self';
 "/>
 
 <!-- X-Frame-Options: DENY
@@ -217,26 +217,29 @@
         <div class="status-dot" aria-hidden="true"></div>
         <!-- The pulsing green dot. aria-hidden="true" hides it from screen readers
              since the text "Available for Freelance" already communicates the meaning. -->
-        Available for Freelance
-        <!-- The visible text inside the badge. -->
+        <span><strong>Rakesh M</strong> — IT Undergraduate | Full Stack Developer | AI Enthusiast</span>
       </div>
 
       <h1 class="hero-title reveal d1">
-      <!-- h1 is the most important heading on the page â€” there should be ONLY ONE h1 per page.
+      <!-- h1 is the most important heading on the page — there should be ONLY ONE h1 per page.
            It is the main title that search engines use to understand what the page is about.
-           d1 = "delay 1" â€” this element animates in with a 0.08s delay. -->
-        <span class="line">Building <span class="gradient-text">Interfaces</span></span>
+           d1 = "delay 1" — this element animates in with a 0.08s delay. -->
+        <span class="line">Building <span class="gradient-text">Smart Web Apps</span>,</span>
         <!-- Each span.line wraps one line of the headline (CSS sets it to display:block).
-             The inner span.gradient-text applies the animated color effect to "Interfaces". -->
-        <span class="line">That Convert</span>
-        <span class="line muted">Code That Scales.</span>
+             The inner span.gradient-text applies the animated color effect to "Smart Web Apps". -->
+        <span class="line">AI Chatbots</span>
+        <span class="line muted">&amp; Business Solutions</span>
         <!-- muted applies the outlined/ghost text style to this third line. -->
       </h1>
 
-      <p class="hero-sub reveal d2">
+      <p class="hero-sub reveal d2" style="font-weight: 500; font-size: 1.05rem; line-height: 1.6; margin-bottom: 0.85rem; max-width: 800px; color: var(--text-primary);">
       <!-- p is a paragraph element. hero-sub is the CSS class for the subtitle style.
-           d2 = "delay 2" â€” animates in after the headline (0.16s delay). -->
-        I bridge the gap between stunning user interfaces and powerful backend logic â€” building web experiences that drive real business growth.
+           d2 = "delay 2" — animates in after the headline (0.16s delay). -->
+        I'm Rakesh, an IT Undergraduate and Full Stack Developer passionate about building modern web applications, AI chatbots, automation tools, and scalable software solutions for businesses and individuals.
+      </p>
+
+      <p class="hero-desc reveal d2" style="font-size: 0.92rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 2.25rem; max-width: 700px; margin-inline: auto;">
+        I bridge the gap between stunning user interfaces and powerful backend systems, building web experiences that solve real problems, improve efficiency, and drive business growth.
       </p>
 
       <div class="hero-cta-row reveal d3">
@@ -259,7 +262,7 @@
             <circle cx="12" cy="12" r="3"/>
             <!-- Two SVG paths that together draw an eye icon (representing "view"). -->
           </svg>
-          View My Work
+          <span>Explore Projects</span>
         </a>
       </div>
     </div>
@@ -1216,6 +1219,13 @@
         because they are already loaded by the time the script runs.
 ------------------------------------------- -->
 <script src="main.js?v=1.2"></script>
+
+<!-- Chatbot Widget Integration -->
+<script
+  src="https://chatbot-rakesh.vercel.app/widget.js"
+  data-widget-token="1a6274f347e973fa9070bb3685ecc5bb60aa92c463730e96238db4863b9fb5a5"
+  data-api-url="https://chat-bot-api-ns81.onrender.com/">
+</script>
 
 </body>
 </html>
