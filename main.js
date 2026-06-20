@@ -502,6 +502,18 @@ function initCardTilt() {
       card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
       card.style.boxShadow = "";
     });
+
+    if (card.classList.contains("project-card")) {
+      card.style.cursor = "pointer";
+      card.addEventListener("click", e => {
+        if (!e.target.closest("a") && !e.target.closest("button")) {
+          const link = card.querySelector("a");
+          if (link) {
+            window.open(link.href, "_blank", "noopener,noreferrer");
+          }
+        }
+      });
+    }
   });
 }
 
