@@ -290,216 +290,300 @@ if (particleContainer && !prefersReducedMotion) {
 
 
 /* -------------------------------------------
-   3D CANVAS — SMOOTH POINTER / TOUCH TRACKING
-   This sets up the 3D particle plexus sphere canvas in the hero section,
-   which responds to mouse rotation, drag/touch, and cursor attraction.
+   3D CANVAS — INTERACTIVE ROTATING SPHERE
 ------------------------------------------- */
-
 function init3DCanvas(prefersReducedMotion) {
-  const canvas = document.getElementById("canvas3d");
-  const scene = document.querySelector('.hero-scene');
+  const canvas = document.getElementById('canvas3d');
+  const scene  = document.querySelector('.hero-scene');
   if (!canvas || !scene) return;
 
-  const ctx = canvas.getContext("2d");
-  let width = canvas.width;
-  let height = canvas.height;
+  const ctx = canvas.getContext('2d');
+  let W = 380, H = 380;
 
+  /* HiDPI support */
   function resize() {
-    const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    width = rect.width;
-    height = rect.height;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
+    const r = canvas.getBoundingClientRect();
+    W = r.width  || 380;
+    H = r.height || 380;
+    canvas.width  = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   resize();
-  window.addEventListener("resize", resize);
+  window.addEventListener('resize', () => { resize(); }, { passive: true });
 
-  const cols = 13;
-  const rows = 13;
-  const spacingX = 26;
-  const spacingZ = 26;
-  const maxRadius = 230;
-  const particles = [];
-  
-  for (let c = 0; c < cols; c++) {
-    const baseX = (c - (cols - 1) / 2) * spacingX;
-    for (let r = 0; r < rows; r++) {
-      const baseZ = (r - (rows - 1) / 2) * spacingZ;
-      particles.push({
-        x: baseX,
-        y: 0,
-        z: baseZ,
-        baseX: baseX,
-        baseY: 0,
-        baseZ: baseZ
-      });
-    }
+  /* ── Sphere setup ────────────────────────── */
+  const R     = 155;  // radius
+  const N     = 200;  // particles
+  const FOCAL = 400;  // perspective
+  const CDIST = 115;  // neighbour link distance
+
+  // Fibonacci sphere lattice
+  const pts = [];
+  const GA  = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < N; i++) {
+    const y  = 1 - (i / (N - 1)) * 2;
+    const rr = Math.sqrt(Math.max(0, 1 - y * y));
+    const th = GA * i;
+    pts.push({
+      bx: Math.cos(th) * rr * R,
+      by: y * R,
+      bz: Math.sin(th) * rr * R,
+      ph: Math.random() * Math.PI * 2
+    });
   }
 
-  let rotX = -0.6;
-  let rotY = 0.5;
-  let targetRotX = -0.6;
-  let targetRotY = 0.5;
-  
-  let mouse = { x: 0, y: 0, active: false };
-  let isDragging = false;
-  let prevMouseX = 0;
-  let prevMouseY = 0;
+  // Pre-build adjacency (done once at startup)
+  const adj = Array.from({ length: N }, () => []);
+  for (let i = 0; i < N; i++) {
+    const row = [];
+    for (let j = i + 1; j < N; j++) {
+      const dx = pts[i].bx - pts[j].bx;
+      const dy = pts[i].by - pts[j].by;
+      const dz = pts[i].bz - pts[j].bz;
+      const d  = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      if (d < CDIST) row.push(j);
+    }
+    adj[i] = row;
+  }
 
-  scene.addEventListener("pointerdown", (e) => {
+  /* ── State ────────────────────────────────── */
+  let rotX = -0.4, rotY = 0.5;
+  let tgtX = rotX, tgtY = rotY;
+  let velX = 0,    velY = 0;
+  let drag = false, px0 = 0, py0 = 0;
+
+  // Mouse in scene-local coordinates (-1…+1)
+  let msx = 0, msy = 0, mOver = false;
+
+  /* ── ALL pointer input via scene element ──── */
+  scene.style.cursor = 'grab';
+
+  scene.addEventListener('mousedown', e => {
     if (e.button !== 0) return;
-    isDragging = true;
-    prevMouseX = e.clientX;
-    prevMouseY = e.clientY;
-    scene.setPointerCapture(e.pointerId);
+    drag = true;
+    px0  = e.clientX;
+    py0  = e.clientY;
+    velX = velY = 0;
+    scene.style.cursor = 'grabbing';
   });
 
-  scene.addEventListener("pointermove", (e) => {
-    const rect = scene.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left - rect.width / 2;
-    mouse.y = e.clientY - rect.top - rect.height / 2;
-    mouse.active = true;
+  window.addEventListener('mousemove', e => {
+    // Track mouse relative to SCENE (not canvas) for wide hover area
+    const r = scene.getBoundingClientRect();
+    msx   = (e.clientX - r.left  - r.width  / 2) / (r.width  / 2);
+    msy   = (e.clientY - r.top   - r.height / 2) / (r.height / 2);
+    mOver = (e.clientX >= r.left && e.clientX <= r.right &&
+             e.clientY >= r.top  && e.clientY <= r.bottom);
 
-    if (isDragging) {
-      const deltaX = e.clientX - prevMouseX;
-      const deltaY = e.clientY - prevMouseY;
-      targetRotY += deltaX * 0.007;
-      targetRotX -= deltaY * 0.007;
-      prevMouseX = e.clientX;
-      prevMouseY = e.clientY;
+    if (drag) {
+      const dx = e.clientX - px0;
+      const dy = e.clientY - py0;
+      velY =  dx * 0.010;
+      velX = -dy * 0.010;
+      tgtY += velY;
+      tgtX += velX;
+      px0 = e.clientX;
+      py0 = e.clientY;
     }
   });
 
-  const endDrag = (e) => {
-    if (!isDragging) return;
-    isDragging = false;
-    try {
-      scene.releasePointerCapture(e.pointerId);
-    } catch (_) {}
-  };
-
-  scene.addEventListener("pointerup", endDrag);
-  scene.addEventListener("pointercancel", endDrag);
-  scene.addEventListener("pointerleave", () => {
-    mouse.active = false;
+  window.addEventListener('mouseup', () => {
+    drag = false;
+    scene.style.cursor = 'grab';
   });
 
-  function animate(timestamp) {
-    ctx.clearRect(0, 0, width, height);
+  // Touch support
+  let t0x = 0, t0y = 0;
+  scene.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    drag = true; px0 = t.clientX; py0 = t.clientY; velX = velY = 0;
+  }, { passive: true });
+  scene.addEventListener('touchmove', e => {
+    if (!drag) return;
+    const t  = e.touches[0];
+    const dx = t.clientX - px0;
+    const dy = t.clientY - py0;
+    velY =  dx * 0.010; velX = -dy * 0.010;
+    tgtY += velY; tgtX += velX;
+    px0 = t.clientX; py0 = t.clientY;
+  }, { passive: true });
+  scene.addEventListener('touchend', () => { drag = false; });
 
-    const t = timestamp / 1000;
+  scene.addEventListener('mouseleave', () => { mOver = false; });
 
-    if (!isDragging && !prefersReducedMotion) {
-      targetRotY += 0.0012;
-      targetRotX = -0.55 + Math.sin(t * 0.15) * 0.08;
-    }
+  /* ── Pulse ring ───────────────────────────── */
+  let pulseT = 0;
 
-    rotX += (targetRotX - rotX) * 0.1;
-    rotY += (targetRotY - rotY) * 0.1;
+  /* ── Render ───────────────────────────────── */
+  function draw(ts) {
+    const t = ts * 0.001;
 
-    const cosX = Math.cos(rotX);
-    const sinX = Math.sin(rotX);
-    const cosY = Math.cos(rotY);
-    const sinY = Math.sin(rotY);
+    if (!drag) {
+      // Inertia decay
+      velX *= 0.88;
+      velY *= 0.88;
 
-    // Update wave heights
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-      const dFromCenter = Math.sqrt(p.baseX * p.baseX + p.baseZ * p.baseZ);
-      let waveY = Math.sin(dFromCenter * 0.035 - t * 2.2) * 15;
-
-      if (mouse.active && !prefersReducedMotion) {
-        const dx = p.baseX - mouse.x * 0.85;
-        const dz = p.baseZ - mouse.y * 0.85;
-        const dist = Math.sqrt(dx * dx + dz * dz);
-        if (dist < 100) {
-          waveY += Math.cos(dist * 0.08 - t * 4) * ((100 - dist) / 100) * 22;
-        }
-      }
-      p.y = waveY;
-    }
-
-    const projected = [];
-    const focalLength = 320;
-    const centerX = width / 2;
-    const centerY = height / 2;
-
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-
-      let x1 = p.x * cosY - p.z * sinY;
-      let z1 = p.x * sinY + p.z * cosY;
-
-      let y2 = p.y * cosX - z1 * sinX;
-      let z2 = p.y * sinX + z1 * cosX;
-
-      const scale = focalLength / (focalLength + z2);
-      const projX = x1 * scale + centerX;
-      const projY = y2 * scale + centerY;
-
-      projected.push({ x: projX, y: projY, z: z2 });
-    }
-
-    // Render grid lines (connections between column and row neighbors)
-    for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < rows; r++) {
-        const idx1 = c * rows + r;
-        const p1 = projected[idx1];
-
-        // Connect to right neighbor
-        if (c < cols - 1) {
-          const idx2 = (c + 1) * rows + r;
-          const p2 = projected[idx2];
-          drawGridLine(p1, p2);
-        }
-
-        // Connect to bottom neighbor
-        if (r < rows - 1) {
-          const idx2 = c * rows + (r + 1);
-          const p2 = projected[idx2];
-          drawGridLine(p1, p2);
-        }
+      // Mouse tilt: sphere leans toward cursor
+      if (mOver && !prefersReducedMotion) {
+        tgtX = -0.40 + msy * 0.55 + Math.sin(t * 0.22) * 0.08;
+        tgtY += velY + 0.0025 + msx * 0.012;
+      } else {
+        tgtX = -0.40 + Math.sin(t * 0.22) * 0.08;
+        tgtY += velY + 0.0025;
       }
     }
 
-    function drawGridLine(p1, p2) {
-      const dx = p1.x - p2.x;
-      const dy = p1.y - p2.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+    rotX += (tgtX - rotX) * 0.08;
+    rotY += (tgtY - rotY) * 0.08;
 
-      if (dist < 90) {
-        const avgZ = (p1.z + p2.z) / 2;
-        const alpha = (1 - dist / 90) * 0.13 * (1 - avgZ / (maxRadius * 1.5));
-        ctx.strokeStyle = `rgba(193, 18, 31, ${Math.max(0, alpha).toFixed(3)})`;
-        ctx.lineWidth = 0.8;
+    pulseT = (pulseT + 0.005) % 1;
+
+    const cX = Math.cos(rotX), sX = Math.sin(rotX);
+    const cY = Math.cos(rotY), sY = Math.sin(rotY);
+    const cx = W / 2, cy = H / 2;
+
+    /* Project */
+    const proj = new Array(N);
+    for (let i = 0; i < N; i++) {
+      const p  = pts[i];
+      const x1 = p.bx * cY - p.bz * sY;
+      const z1 = p.bx * sY + p.bz * cY;
+      const y2 = p.by * cX - z1  * sX;
+      const z2 = p.by * sX + z1  * cX;
+      const sc = FOCAL / (FOCAL + z2 + R);
+      const depth = Math.max(0, Math.min(1, (z2 + R) / (2 * R)));
+      const pulse = 0.5 + 0.5 * Math.sin(t * 3 + p.ph);
+      proj[i] = { px: x1 * sc + cx, py: y2 * sc + cy, z: z2, depth, pulse };
+    }
+
+    /* Depth sort */
+    const ord = Array.from({ length: N }, (_, i) => i)
+      .sort((a, b) => proj[a].z - proj[b].z);
+
+    /* Clear */
+    ctx.clearRect(0, 0, W, H);
+
+    /* Ambient glow */
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 1.7);
+    g.addColorStop(0,   'rgba(193,18,31,0.25)');
+    g.addColorStop(0.5, 'rgba(193,18,31,0.08)');
+    g.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R * 1.7, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* Pulse ring */
+    if (!prefersReducedMotion) {
+      const pr = pulseT * R * 1.8;
+      const pa = (1 - pulseT) * 0.8;
+      ctx.save();
+      ctx.shadowColor = 'rgba(193,18,31,1)';
+      ctx.shadowBlur  = 18;
+      ctx.strokeStyle = `rgba(193,18,31,${pa.toFixed(3)})`;
+      ctx.lineWidth   = 2.5 * (1 - pulseT) + 0.3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, pr, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    /* Edges */
+    for (let ii = 0; ii < N; ii++) {
+      const i  = ord[ii];
+      const pi = proj[i];
+      for (const j of adj[i]) {
+        const pj = proj[j];
+        const avgD = (pi.depth + pj.depth) * 0.5;
+        const dx = pts[i].bx - pts[j].bx;
+        const dy = pts[i].by - pts[j].by;
+        const dz = pts[i].bz - pts[j].bz;
+        const d3 = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        const a  = (1 - d3 / CDIST) * 0.7 * (0.3 + avgD * 0.7);
+        ctx.strokeStyle = `rgba(193,18,31,${Math.min(0.9, a).toFixed(3)})`;
+        ctx.lineWidth   = 0.5 + avgD * 1.5;
         ctx.beginPath();
-        ctx.moveTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
+        ctx.moveTo(pi.px, pi.py);
+        ctx.lineTo(pj.px, pj.py);
         ctx.stroke();
       }
     }
 
-    // Render particles (dots)
-    for (let i = 0; i < projected.length; i++) {
-      const p = projected[i];
-      const alpha = (1 - p.z / (maxRadius * 1.5)) * 0.65;
-      const size = (1 - p.z / maxRadius) * 1.4 + 1.2;
-
-      const color = p.z < 0 
-        ? `rgba(193, 18, 31, ${Math.max(0, alpha).toFixed(3)})` 
-        : `rgba(254, 240, 213, ${Math.max(0, alpha).toFixed(3)})`;
-
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, Math.max(0.4, size), 0, Math.PI * 2);
-      ctx.fill();
+    /* Find nearest node to cursor */
+    let litIdx = -1;
+    if (mOver && !prefersReducedMotion) {
+      const mcx = cx + msx * (W / 2);
+      const mcy = cy + msy * (H / 2);
+      let best = 50;
+      for (let i = 0; i < N; i++) {
+        const dx = proj[i].px - mcx;
+        const dy = proj[i].py - mcy;
+        const d  = Math.sqrt(dx*dx + dy*dy);
+        if (d < best) { best = d; litIdx = i; }
+      }
     }
 
-    requestAnimationFrame(animate);
+    /* Particles */
+    for (let ii = 0; ii < N; ii++) {
+      const i   = ord[ii];
+      const p   = proj[i];
+      const pt  = pts[i];
+      const lit = (i === litIdx);
+
+      // Colour: dark-red → crimson → warm gold
+      let r, gg, b;
+      if (p.depth < 0.5) {
+        const f = p.depth * 2;
+        r  = Math.round(80  + f * 113);
+        gg = Math.round(8   + f * 10);
+        b  = Math.round(8   + f * 23);
+      } else {
+        const f = (p.depth - 0.5) * 2;
+        r  = Math.round(193 + f * 62);
+        gg = Math.round(18  + f * 192);
+        b  = Math.round(31  + f * 89);
+      }
+
+      const alpha = 0.6 + p.depth * 0.4;
+      const sz    = (1.8 + p.depth * 3.2) * (1 + pt.pulse * 0.3);
+      const finalSz = lit ? sz * 3.5 : sz;
+
+      // Glow halo
+      if (!prefersReducedMotion) {
+        const gr2 = ctx.createRadialGradient(p.px, p.py, 0, p.px, p.py, finalSz * 5);
+        gr2.addColorStop(0, `rgba(${r},${gg},${b},${(alpha * 0.6).toFixed(3)})`);
+        gr2.addColorStop(1, `rgba(${r},${gg},${b},0)`);
+        ctx.fillStyle = gr2;
+        ctx.beginPath();
+        ctx.arc(p.px, p.py, finalSz * 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Core dot
+      ctx.fillStyle = `rgba(${r},${gg},${b},${alpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(p.px, p.py, Math.max(0.8, finalSz), 0, Math.PI * 2);
+      ctx.fill();
+
+      // Highlight
+      if (lit) {
+        ctx.save();
+        ctx.shadowColor = `rgba(${r},${gg},${b},1)`;
+        ctx.shadowBlur  = 28;
+        ctx.fillStyle   = 'rgba(255,245,220,1)';
+        ctx.beginPath();
+        ctx.arc(p.px, p.py, finalSz, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    requestAnimationFrame(draw);
   }
-  requestAnimationFrame(animate);
+
+  requestAnimationFrame(draw);
 }
 
 /* 3D Card Tilt Effect */

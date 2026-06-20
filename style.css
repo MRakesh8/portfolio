@@ -624,13 +624,13 @@ body::after{
   flex-direction:column;   /* Top to bottom layout. */
   align-items:center;      /* Centers everything horizontally. */
   justify-content:center;  /* Centers everything vertically. */
-  padding-top:64px;        /* Pushes content below the fixed navbar (which is 64px tall). */
+  padding-top:100px;       /* Pushes content below the fixed navbar with extra breathing room. */
   padding-bottom:0;        /* No bottom padding. */
   position:relative;       /* Allows the ambient orbs to be positioned inside. */
   overflow:hidden;         /* Hides the orbs that extend outside the section boundary. */
 }
 
-/* The block containing the status badge, headline, subtitle, and buttons. */
+/* The block containing the headline, subtitle, and buttons. */
 .hero-top{
   position:relative;       /* Allows z-index to work. */
   z-index:2;               /* Sits in front of the 3D scene and orbs. */
@@ -771,16 +771,19 @@ body::after{
 
 /* 3D Canvas Viewport */
 #canvas3d {
-  width: 380px;
-  height: 380px;
-  max-width: 95%;
-  max-height: 95%;
+  width: 420px;
+  height: 420px;
+  max-width: 98%;
+  max-height: 98%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
   pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  display: block;
 }
 
 
