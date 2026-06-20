@@ -290,166 +290,224 @@ if (particleContainer && !prefersReducedMotion) {
 
 
 /* -------------------------------------------
-   3D CUBE — SMOOTH POINTER / TOUCH TRACKING
-   Desktop: follows cursor on hover.
-   Mobile: drag anywhere on the scene (pointer capture).
-   Rotation is smoothed with requestAnimationFrame lerp.
+   3D CANVAS — SMOOTH POINTER / TOUCH TRACKING
+   This sets up the 3D particle plexus sphere canvas in the hero section,
+   which responds to mouse rotation, drag/touch, and cursor attraction.
 ------------------------------------------- */
 
-const heroVisual = document.querySelector('.hero-scene');
-const cube = document.querySelector('.cube');
+function init3DCanvas(prefersReducedMotion) {
+  const canvas = document.getElementById("canvas3d");
+  const scene = document.querySelector('.hero-scene');
+  if (!canvas || !scene) return;
 
-if (heroVisual && cube) {
-  const isCoarsePointer = window.matchMedia('(hover: none), (pointer: coarse)').matches;
-  const DEFAULT_X = -22;
-  const DEFAULT_Y = 38;
+  const ctx = canvas.getContext("2d");
+  let width = canvas.width;
+  let height = canvas.height;
 
-  const cubeState = {
-    currentX: DEFAULT_X,
-    currentY: DEFAULT_Y,
-    targetX: DEFAULT_X,
-    targetY: DEFAULT_Y,
-    dragging: false,
-    pointerDown: false,
-    idle: !prefersReducedMotion,
-    rafId: null
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    width = rect.width;
+    height = rect.height;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const particleCount = 65;
+  const sphereRadius = 110;
+  const particles = [];
+  
+  for (let i = 0; i < particleCount; i++) {
+    const phi = Math.acos(-1 + (2 * i) / particleCount);
+    const theta = Math.sqrt(particleCount * Math.PI) * phi;
+    particles.push({
+      x: sphereRadius * Math.cos(theta) * Math.sin(phi),
+      y: sphereRadius * Math.sin(theta) * Math.sin(phi),
+      z: sphereRadius * Math.cos(phi),
+      baseX: sphereRadius * Math.cos(theta) * Math.sin(phi),
+      baseY: sphereRadius * Math.sin(theta) * Math.sin(phi),
+      baseZ: sphereRadius * Math.cos(phi)
+    });
+  }
+
+  let rotX = -0.5;
+  let rotY = 0.8;
+  let targetRotX = -0.5;
+  let targetRotY = 0.8;
+  
+  let mouse = { x: 0, y: 0, active: false };
+  let isDragging = false;
+  let prevMouseX = 0;
+  let prevMouseY = 0;
+
+  scene.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    isDragging = true;
+    prevMouseX = e.clientX;
+    prevMouseY = e.clientY;
+    scene.setPointerCapture(e.pointerId);
+  });
+
+  scene.addEventListener("pointermove", (e) => {
+    const rect = scene.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left - rect.width / 2;
+    mouse.y = e.clientY - rect.top - rect.height / 2;
+    mouse.active = true;
+
+    if (isDragging) {
+      const deltaX = e.clientX - prevMouseX;
+      const deltaY = e.clientY - prevMouseY;
+      targetRotY += deltaX * 0.007;
+      targetRotX -= deltaY * 0.007;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    }
+  });
+
+  const endDrag = (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    try {
+      scene.releasePointerCapture(e.pointerId);
+    } catch (_) {}
   };
 
-  function setTargetsFromClient(clientX, clientY) {
-    const r = heroVisual.getBoundingClientRect();
-    const x = (clientX - r.left) / r.width - 0.5;
-    const y = (clientY - r.top) / r.height - 0.5;
-    cubeState.targetY = DEFAULT_Y + x * 80;
-    cubeState.targetX = DEFAULT_X - y * 60;
-  }
-
-  function applyCubeRotation() {
-    cube.style.setProperty('--cube-x', cubeState.currentX.toFixed(2) + 'deg');
-    cube.style.setProperty('--cube-y', cubeState.currentY.toFixed(2) + 'deg');
-  }
-
-  function lerp(current, target, amount) {
-    return current + (target - current) * amount;
-  }
-
-  function tick(now) {
-    if (
-      cubeState.idle &&
-      !cubeState.dragging &&
-      !heroVisual.classList.contains('is-interacting') &&
-      !prefersReducedMotion
-    ) {
-      const t = now / 1000;
-      cubeState.targetY = DEFAULT_Y + Math.sin(t * 0.5) * 18;
-      cubeState.targetX = DEFAULT_X + Math.cos(t * 0.4) * 10;
-    }
-
-    const ease = cubeState.dragging
-      ? (isCoarsePointer ? 0.35 : 0.28)
-      : cubeState.pointerDown ? 0.22 : 0.14;
-    cubeState.currentX = lerp(cubeState.currentX, cubeState.targetX, ease);
-    cubeState.currentY = lerp(cubeState.currentY, cubeState.targetY, ease);
-    applyCubeRotation();
-
-    const dx = Math.abs(cubeState.targetX - cubeState.currentX);
-    const dy = Math.abs(cubeState.targetY - cubeState.currentY);
-    const needsFrame = cubeState.dragging || cubeState.idle || dx > 0.05 || dy > 0.05;
-
-    if (needsFrame) {
-      cubeState.rafId = requestAnimationFrame(tick);
-    } else {
-      cubeState.rafId = null;
-    }
-  }
-
-  function startCubeLoop() {
-    if (!cubeState.rafId) {
-      cubeState.rafId = requestAnimationFrame(tick);
-    }
-  }
-
-  function stopCubeLoop() {
-    if (cubeState.rafId) {
-      cancelAnimationFrame(cubeState.rafId);
-      cubeState.rafId = null;
-    }
-  }
-
-  function beginInteraction(e) {
-    cubeState.pointerDown = true;
-    cubeState.dragging = true;
-    cubeState.idle = false;
-    heroVisual.classList.add('is-interacting');
-    heroVisual.setPointerCapture(e.pointerId);
-    setTargetsFromClient(e.clientX, e.clientY);
-    startCubeLoop();
-  }
-
-  function endInteraction(e) {
-    if (!cubeState.pointerDown) return;
-
-    cubeState.pointerDown = false;
-    cubeState.dragging = false;
-    heroVisual.classList.remove('is-interacting');
-
-    try {
-      heroVisual.releasePointerCapture(e.pointerId);
-    } catch (_) {
-      /* pointer may already be released */
-    }
-
-    if (isCoarsePointer) {
-      cubeState.targetX = DEFAULT_X;
-      cubeState.targetY = DEFAULT_Y;
-      cubeState.idle = !prefersReducedMotion;
-      startCubeLoop();
-      return;
-    }
-
-    cubeState.targetX = DEFAULT_X;
-    cubeState.targetY = DEFAULT_Y;
-    startCubeLoop();
-  }
-
-  heroVisual.addEventListener('pointerdown', e => {
-    if (e.button !== 0) return;
-    e.preventDefault();
-    beginInteraction(e);
-  }, { passive: false });
-
-  heroVisual.addEventListener('pointermove', e => {
-    if (cubeState.dragging) {
-      setTargetsFromClient(e.clientX, e.clientY);
-      startCubeLoop();
-      return;
-    }
-
-    if (!isCoarsePointer && e.pointerType === 'mouse') {
-      heroVisual.classList.add('is-interacting');
-      setTargetsFromClient(e.clientX, e.clientY);
-      startCubeLoop();
-    }
+  scene.addEventListener("pointerup", endDrag);
+  scene.addEventListener("pointercancel", endDrag);
+  scene.addEventListener("pointerleave", () => {
+    mouse.active = false;
   });
 
-  heroVisual.addEventListener('pointerup', endInteraction);
-  heroVisual.addEventListener('pointercancel', endInteraction);
+  function animate(timestamp) {
+    ctx.clearRect(0, 0, width, height);
 
-  heroVisual.addEventListener('pointerleave', () => {
-    if (cubeState.dragging) return;
-
-    heroVisual.classList.remove('is-interacting');
-
-    if (!isCoarsePointer) {
-      cubeState.targetX = DEFAULT_X;
-      cubeState.targetY = DEFAULT_Y;
-      startCubeLoop();
+    if (!isDragging && !prefersReducedMotion) {
+      const t = timestamp / 1000;
+      targetRotY += 0.0015;
+      targetRotX = -0.4 + Math.sin(t * 0.2) * 0.15;
     }
-  });
 
-  if (cubeState.idle) {
-    startCubeLoop();
+    rotX += (targetRotX - rotX) * 0.1;
+    rotY += (targetRotY - rotY) * 0.1;
+
+    const cosX = Math.cos(rotX);
+    const sinX = Math.sin(rotX);
+    const cosY = Math.cos(rotY);
+    const sinY = Math.sin(rotY);
+
+    const projected = [];
+    const focalLength = 320;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      let x1 = p.x * cosY - p.z * sinY;
+      let z1 = p.x * sinY + p.z * cosY;
+
+      let y2 = p.y * cosX - z1 * sinX;
+      let z2 = p.y * sinX + z1 * cosX;
+
+      if (mouse.active && !prefersReducedMotion) {
+        const scale = focalLength / (focalLength + z2);
+        const scrX = x1 * scale;
+        const scrY = y2 * scale;
+        const dx = mouse.x - scrX;
+        const dy = mouse.y - scrY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 110) {
+          const force = ((110 - dist) / 110) * 8;
+          x1 += (dx / dist) * force;
+          y2 += (dy / dist) * force;
+        }
+      }
+
+      const scale = focalLength / (focalLength + z2);
+      const projX = x1 * scale + centerX;
+      const projY = y2 * scale + centerY;
+
+      projected.push({ x: projX, y: projY, z: z2 });
+    }
+
+    for (let i = 0; i < projected.length; i++) {
+      for (let j = i + 1; j < projected.length; j++) {
+        const p1 = projected[i];
+        const p2 = projected[j];
+        
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 80) {
+          const alpha = (1 - dist / 80) * 0.18 * (1 - (p1.z + p2.z) / (2 * sphereRadius));
+          ctx.strokeStyle = `rgba(193, 18, 31, ${alpha.toFixed(3)})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (let i = 0; i < projected.length; i++) {
+      const p = projected[i];
+      const alpha = (1 - p.z / (sphereRadius * 1.5)) * 0.65;
+      const size = (1 - p.z / sphereRadius) * 2 + 1.5;
+
+      const color = p.z < 0 
+        ? `rgba(193, 18, 31, ${alpha.toFixed(3)})` 
+        : `rgba(254, 240, 213, ${alpha.toFixed(3)})`;
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(0.5, size), 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(animate);
   }
+  requestAnimationFrame(animate);
 }
+
+/* 3D Card Tilt Effect */
+function initCardTilt() {
+  const cards = document.querySelectorAll(".project-card, .service-card, .skill-group, .cert-card");
+  
+  cards.forEach(card => {
+    card.style.transformStyle = "preserve-3d";
+    
+    card.addEventListener("mousemove", e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const tiltX = ((centerY - y) / centerY) * 10;
+      const tiltY = ((x - centerX) / centerX) * 10;
+      
+      card.style.transition = "transform 0.08s ease-out, box-shadow 0.08s ease-out";
+      card.style.transform = `perspective(1000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
+      
+      card.style.boxShadow = `0 15px 35px -5px rgba(168, 85, 247, 0.25)`;
+    });
+    
+    card.addEventListener("mouseleave", () => {
+      card.style.transition = "transform 0.4s ease, box-shadow 0.4s ease";
+      card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+      card.style.boxShadow = "";
+    });
+  });
+}
+
+// Run canvas and tilt animations
+init3DCanvas(prefersReducedMotion);
+initCardTilt();
 
 
 /* -------------------------------------------

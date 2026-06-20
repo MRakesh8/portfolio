@@ -1,4 +1,4 @@
-﻿/* ==============================================
+/* ==============================================
    style.css â€” Main Stylesheet for Rakesh Portfolio
    This file controls ALL the visual design:
    colors, sizes, spacing, animations, and layout.
@@ -40,8 +40,8 @@ body {
   /* Two soft glowing circles painted on the background:
      One purple at the top-right, one pink at the bottom-left.
      rgba(r,g,b,a) â€” the last number is opacity (0=invisible, 1=solid). */
-  background-image: radial-gradient(circle at top right, rgba(139,92,246,0.12), transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(236,72,153,0.12), transparent 40%);
+  background-image: radial-gradient(circle at top right, rgba(193, 18, 31, 0.12), transparent 45%),
+                    radial-gradient(circle at bottom left, rgba(0, 47, 73, 0.18), transparent 45%);
 
   background-attachment: fixed;     /* The background gradient stays fixed when you scroll (parallax feel). */
   color: var(--text-primary);       /* Default text color for the whole page (light grey/white). */
@@ -73,22 +73,22 @@ ul{list-style:none}
    They are defined inside :root which means "apply globally".
 ------------------------------------------- */
 :root{
-  --bg-base: #000000;                    /* The main background color. Pure black. */
-  --bg-card: rgba(17, 24, 39, 0.7);     /* Card background â€” dark navy, 70% opaque (glassmorphism). */
-  --bg-card2: rgba(31, 41, 55, 0.4);    /* A slightly lighter card background variant, 40% opaque. */
-  --blue: #8b5cf6;                       /* The main accent color â€” a vibrant purple. */
-  --blue-light: #a78bfa;                 /* A lighter purple, used for hover states and highlights. */
-  --blue-dim: rgba(139, 92, 246, 0.15); /* The same purple at 15% opacity â€” used for subtle backgrounds. */
-  --blue-border: rgba(255, 255, 255, 0.1);       /* A very faint white border color. */
-  --blue-border-strong: rgba(139, 92, 246, 0.5); /* A stronger purple border for hover effects. */
-  --text-primary: #f9fafb;              /* Main text color â€” almost white. */
-  --text-muted: #9ca3af;               /* Secondary text â€” medium grey, for descriptions. */
-  --text-dim: #4b5563;                 /* Dimmed text â€” dark grey, for labels and minor info. */
-  --radius-sm: 8px;                    /* Small border-radius â€” slightly rounded corners. */
-  --radius-md: 12px;                   /* Medium border-radius â€” moderately rounded corners. */
-  --radius-lg: 16px;                   /* Large border-radius â€” very rounded corners. */
-  --transition: 0.3s ease;            /* Default animation speed for hover effects. 0.3 seconds, smooth ease. */
-  --font-display: 'Syne', sans-serif; /* Display/heading font loaded from Google Fonts. */
+  --bg-base: #00121d;                    /* Rich deep base derived from Cosmos Blue */
+  --bg-card: rgba(0, 47, 73, 0.55);     /* Cosmos Blue glassmorphism */
+  --bg-card2: rgba(0, 71, 110, 0.35);    /* Slightly lighter card background variant */
+  --blue: #C1121F;                       /* Crimson Blaze primary accent */
+  --blue-light: #e62635;                 /* Lighter Crimson hover color */
+  --blue-dim: rgba(193, 18, 31, 0.18); /* Crimson Blaze glow */
+  --blue-border: rgba(254, 240, 213, 0.07);       /* Tinted with Varden cream */
+  --blue-border-strong: rgba(193, 18, 31, 0.5); /* Stronger Crimson Blaze border */
+  --text-primary: #FEF0D5;              /* Soft warm Varden cream text */
+  --text-muted: #e5dac4;               /* Secondary text */
+  --text-dim: #aba18e;                 /* Dimmed text */
+  --radius-sm: 8px;                    /* Small border-radius */
+  --radius-md: 12px;                   /* Medium border-radius */
+  --radius-lg: 16px;                   /* Large border-radius */
+  --transition: 0.3s ease;            /* Default animation speed */
+  --font-display: 'Syne', sans-serif; /* Display font */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1);
 }
@@ -153,7 +153,7 @@ body::after{
 /* .gradient-text creates the animated rainbow gradient on text (like the name "Rakesh"). */
 .gradient-text{
   /* Creates a diagonal gradient from blue to purple to pink and back to blue. */
-  background:linear-gradient(270deg, #60a5fa, #c084fc, #f472b6, #60a5fa);
+  background:linear-gradient(270deg, #C1121F, #FEF0D5, #780001, #C1121F);
 
   background-size: 300% 300%; /* Makes the gradient 3x wider than needed so it can scroll/animate. */
 
@@ -711,120 +711,18 @@ body::after{
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
 
-/* The perspective wrapper gives the cube its 3D depth.
-   A larger perspective value makes the 3D effect look more distant (less extreme). */
-.cube-wrap{
-  perspective:520px;
-  perspective-origin:50% 48%;
-  transform-style:preserve-3d;
-  position:relative;
-  z-index:2;
-}
-
-.cube-wrap::before{
-  content:'';
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:200px;
-  height:200px;
-  transform:translate(-50%, -50%);
-  background:radial-gradient(circle, rgba(139,92,246,0.32) 0%, transparent 68%);
-  pointer-events:none;
-  z-index:-1;
-  animation:cubeAura 10s ease-in-out infinite;
-}
-
-.cube-wrap::after{
-  content:'';
-  position:absolute;
-  left:50%;
-  bottom:-32px;
-  width:120px;
-  height:28px;
-  transform:translateX(-50%);
-  background:radial-gradient(ellipse, rgba(139,92,246,0.45) 0%, transparent 72%);
-  pointer-events:none;
-  z-index:-1;
-}
-
-@keyframes cubeAura{
-  0%, 100% { opacity:0.65; transform:translate(-50%, -50%) scale(1); }
-  50%      { opacity:1; transform:translate(-50%, -50%) scale(1.12); }
-}
-
-.cube{
-  width:110px;height:110px;
-  position:relative;
-  transform-style:preserve-3d;
-  transform:rotateX(var(--cube-x,-22deg)) rotateY(var(--cube-y,38deg)) translateZ(0);
-  will-change:transform;
-}
-
-.hero-scene.is-interacting .cube-wrap::before{
-  animation-play-state:paused;
-  opacity:1;
-}
-
-.face{
-  position:absolute;
-  inset:0;
-  width:110px;
-  height:110px;
-  transform-style:preserve-3d;
-  backface-visibility:visible;
-  -webkit-backface-visibility:visible;
-  border:1px solid rgba(196, 181, 253, 0.55);
-  box-shadow:
-    inset 0 0 40px rgba(139, 92, 246, 0.2),
-    inset 2px 2px 0 rgba(255, 255, 255, 0.12);
-}
-
-.face::before{
-  content:'';
-  position:absolute;
-  inset:8px;
-  border:1px solid rgba(167, 139, 250, 0.2);
-  border-radius:4px;
-  background:
-    linear-gradient(rgba(167, 139, 250, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(167, 139, 250, 0.06) 1px, transparent 1px);
-  background-size:14px 14px;
-  pointer-events:none;
-}
-
-.face.front{
-  transform:rotateY(0deg) translateZ(55px);
-  background:linear-gradient(145deg, rgba(167, 139, 250, 0.42), rgba(99, 102, 241, 0.22));
-}
-
-.face.back{
-  transform:rotateY(180deg) translateZ(55px);
-  background:linear-gradient(145deg, rgba(67, 56, 202, 0.35), rgba(30, 27, 75, 0.45));
-  border-color:rgba(109, 40, 217, 0.45);
-}
-
-.face.right{
-  transform:rotateY(90deg) translateZ(55px);
-  background:linear-gradient(160deg, rgba(124, 58, 237, 0.38), rgba(76, 29, 149, 0.28));
-}
-
-.face.left{
-  transform:rotateY(-90deg) translateZ(55px);
-  background:linear-gradient(200deg, rgba(91, 33, 182, 0.4), rgba(49, 46, 129, 0.32));
-}
-
-.face.top{
-  transform:rotateX(90deg) translateZ(55px);
-  background:linear-gradient(180deg, rgba(196, 181, 253, 0.35), rgba(139, 92, 246, 0.18));
-  border-color:rgba(221, 214, 254, 0.5);
-}
-
-.face.bottom{
-  transform:rotateX(-90deg) translateZ(55px);
-  background:linear-gradient(0deg, rgba(49, 46, 129, 0.5), rgba(30, 27, 75, 0.4));
-  border-color:rgba(79, 70, 229, 0.4);
-  box-shadow:inset 0 -8px 24px rgba(0, 0, 0, 0.35);
+/* 3D Canvas Viewport */
+#canvas3d {
+  width: 380px;
+  height: 380px;
+  max-width: 95%;
+  max-height: 95%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: auto;
 }
 
 
@@ -1844,4 +1742,65 @@ footer{
   }
 
   .card::after{display:none}
+}
+
+/* Certifications Section */
+.certifications-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.cert-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+}
+
+.cert-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blue-light, #a78bfa);
+  flex-shrink: 0;
+}
+
+.cert-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cert-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.cert-issuer {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Responsiveness for Certifications Grid */
+@media (max-width: 1024px) {
+  .certifications-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .certifications-grid {
+    grid-template-columns: 1fr;
+  }
 }

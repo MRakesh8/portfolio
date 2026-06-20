@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!-- DOCTYPE tells the browser: "This is a modern HTML5 page."
      Without it, the browser may render the page in a broken "quirks mode". -->
 
@@ -183,13 +183,13 @@
   <!-- Ambient background orbs â€” large blurry colored circles.
        They are purely decorative and create a depth/glow feel.
        The style attribute sets position, size, color, and animation delay inline. -->
-  <div class="orb" style="width:700px;height:700px;background:rgba(37,99,235,0.12);top:-250px;left:-200px;animation-delay:0s"></div>
+  <div class="orb" style="width:700px;height:700px;background:rgba(193,18,31,0.12);top:-250px;left:-200px;animation-delay:0s"></div>
   <!-- Blue orb: 700px circle, 12% opaque blue, positioned above and to the left. Starts immediately. -->
 
-  <div class="orb" style="width:500px;height:500px;background:rgba(124,58,237,0.1);bottom:-150px;right:-150px;animation-delay:3s"></div>
+  <div class="orb" style="width:500px;height:500px;background:rgba(0,47,73,0.22);bottom:-150px;right:-150px;animation-delay:3s"></div>
   <!-- Purple orb: 500px circle, 10% opaque purple, positioned below and to the right. Starts after 3 seconds. -->
 
-  <div class="orb" style="width:300px;height:300px;background:rgba(244,114,182,0.07);top:40%;left:55%;animation-delay:1.5s"></div>
+  <div class="orb" style="width:300px;height:300px;background:rgba(120,0,1,0.1);top:40%;left:55%;animation-delay:1.5s"></div>
   <!-- Pink orb: 300px circle, 7% opaque pink, positioned in the middle-right area. Starts after 1.5 seconds. -->
 
   <div id="particles" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
@@ -276,26 +276,8 @@
       <div class="ring ring-3"></div>
       <!-- ring-3 = innermost ring (175px), rotates fastest (14s). -->
 
-      <div class="cube-wrap">
-      <!-- cube-wrap adds the 3D perspective effect to its child.
-           perspective:900px in CSS makes the 3D cube look like it is 900px away from the viewer. -->
-        <div class="cube">
-        <!-- The cube element. Its rotation is controlled by CSS variables --cube-x and --cube-y
-             that JavaScript updates when the mouse moves over the scene. -->
-          <div class="face front"></div>
-          <!-- front face: pushed 55px toward the viewer along the Z axis. -->
-          <div class="face back"></div>
-          <!-- back face: rotated 180 degrees, then pushed 55px away. -->
-          <div class="face left"></div>
-          <!-- left face: rotated -90 degrees sideways. -->
-          <div class="face right"></div>
-          <!-- right face: rotated +90 degrees sideways. -->
-          <div class="face top"></div>
-          <!-- top face: rotated 90 degrees upward. -->
-          <div class="face bottom"></div>
-          <!-- bottom face: rotated 90 degrees downward. -->
-        </div>
-      </div>
+      <!-- 3D Particle Plexus Canvas -->
+      <canvas id="canvas3d" width="400" height="400"></canvas>
 
       <!-- Six floating technology label pills positioned like a clock around the cube. -->
 
@@ -531,8 +513,8 @@
 
         <div class="project-body">
         <!-- The text content area below the thumbnail. -->
-          <h3 class="project-title">Smart Farm</h3>
-          <p class="project-desc">An innovative web platform designed to streamline agricultural data and smart farming insights &mdash; connecting modern tech with rural productivity.</p>
+          <h3 class="project-title">Smart Farm Telemetry</h3>
+          <p class="project-desc">An interactive agricultural analytics dashboard built to visualize smart farming telemetry. Streamlines real-time diagnostics, soil parameters, and crop metrics to support data-driven cultivation decisions.</p>
           <div class="tech-row">
           <!-- A flex row of technology pill tags. -->
             <span class="tech-pill">HTML5</span>
@@ -558,68 +540,65 @@
         </div>
       </article>
 
-      <!-- Project 2: Psychology Insight -->
+      <!-- Project 2: Chat-Bot -->
       <article class="card project-card reveal d2">
-        <div class="project-thumb" style="background:linear-gradient(135deg,#130a2e,#0d1628)">
-        <!-- Dark purple gradient theme for the Psychology project. -->
-          <div class="live-badge">Live</div>
+        <div class="project-thumb" style="background:linear-gradient(135deg, rgba(193, 18, 31, 0.15) 0%, rgba(3, 7, 18, 0.95) 100%);">
+          <div class="live-badge">Code Only</div>
           <div class="thumb-icon">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" opacity="0.65">
-              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
-              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
-              <!-- Two mirrored paths that draw a brain icon. -->
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#C1121F" stroke-width="1.5" stroke-linecap="round" opacity="0.65">
+              <rect x="3" y="11" width="18" height="10" rx="2"/>
+              <circle cx="12" cy="5" r="2"/>
+              <path d="M12 7v4"/>
+              <line x1="8" y1="16" x2="8.01" y2="16"/>
+              <line x1="16" y1="16" x2="16.01" y2="16"/>
             </svg>
-            <span class="thumb-label" style="color:#a78bfa">Psychology Insight</span>
+            <span class="thumb-label" style="color:#C1121F">Chat-Bot</span>
           </div>
         </div>
         <div class="project-body">
-          <h3 class="project-title">Psychology Insight</h3>
-          <p class="project-desc">A clean, tailored web application providing specialized psychological resources and user-focused layouts that put mental wellness first.</p>
+          <h3 class="project-title">Type-Safe Dialogue Engine</h3>
+          <p class="project-desc">A modular conversational engine architected with TypeScript. Engineered to manage type-safe dialogue structures, dynamic user interactions, and robust state transitions with optimal front-end execution.</p>
           <div class="tech-row">
+            <span class="tech-pill">TypeScript</span>
             <span class="tech-pill">HTML5</span>
-            <span class="tech-pill">Tailwind CSS</span>
-            <span class="tech-pill">Vercel</span>
+            <span class="tech-pill">CSS3</span>
           </div>
-          <a href="https://psychology-insight.vercel.app/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>View Live Project</span>
+          <a href="https://github.com/MRakesh8/Chat-Bot" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+            </svg>
+            <span>View Repository</span>
           </a>
         </div>
       </article>
 
-      <!-- Project 3: Call Record Manager (Android App) -->
+      <!-- Project 3: VA1 (Voice Assistant) -->
       <article class="card project-card reveal d3">
-        <div class="project-thumb" style="background:linear-gradient(135deg,#071a2e,#0d1628)">
-        <!-- Dark blue gradient theme for the mobile app. -->
-          <div class="mobile-badge">Mobile App</div>
-          <!-- Blue "Mobile App" badge instead of green "Live" (not a web project). -->
+        <div class="project-thumb" style="background:linear-gradient(135deg, rgba(0, 47, 73, 0.25) 0%, rgba(3, 7, 18, 0.95) 100%);">
+          <div class="mobile-badge" style="background: rgba(0, 71, 110, 0.4); border-color: rgba(0, 71, 110, 0.6); color: #FEF0D5;">Assistant</div>
           <div class="thumb-icon">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="1.5" stroke-linecap="round" opacity="0.65">
-              <rect x="5" y="2" width="14" height="20" rx="2"/>
-              <circle cx="12" cy="17" r="1" fill="#7dd3fc" stroke="none"/>
-              <!-- Smartphone icon with a filled home button circle. -->
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#FEF0D5" stroke-width="1.5" stroke-linecap="round" opacity="0.65">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
             </svg>
-            <span class="thumb-label" style="color:#7dd3fc">Call Record Manager</span>
+            <span class="thumb-label" style="color:#FEF0D5">Voice Assistant</span>
           </div>
         </div>
         <div class="project-body">
-          <h3 class="project-title">Call Record Manager</h3>
-          <p class="project-desc">A secure Android application engineered to seamlessly log, manage, and safely delete user call records &mdash; privacy-first mobile design.</p>
+          <h3 class="project-title">Cognitive Voice Assistant</h3>
+          <p class="project-desc">A client-side voice control system built using vanilla JavaScript. Leverages HTML5 Speech Recognition Web APIs to parse vocal telemetry, automate browser actions, and execute voice-to-action bindings.</p>
           <div class="tech-row">
-            <span class="tech-pill">Kotlin</span>
-            <span class="tech-pill">Android SDK</span>
-            <span class="tech-pill">Mobile UI</span>
+            <span class="tech-pill">JavaScript</span>
+            <span class="tech-pill">HTML5 API</span>
+            <span class="tech-pill">Web Speech</span>
           </div>
-          <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" disabled title="Android-only app &mdash; not available on web">
-          <!-- button instead of a (anchor link) because this is not a web URL.
-               disabled = the button is not clickable.
-               title = tooltip text shown on hover explaining why it is disabled. -->
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-              <rect x="5" y="2" width="14" height="20" rx="2"/>
-              <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
+          <a href="https://github.com/MRakesh8/VA1" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="width:100%;justify-content:center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
             </svg>
-            Mobile App Project
-          </button>
+            <span>View Repository</span>
+          </a>
         </div>
       </article>
 
@@ -799,13 +778,90 @@
 
 
 <!-- -------------------------------------------
+     CERTIFICATIONS SECTION
+     List of verified certifications.
+------------------------------------------- -->
+<section id="certifications" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Qualifications
+      </div>
+      <h2 class="section-title">Verified <span class="gradient-text">Technical Accreditations</span></h2>
+      <p class="section-subtitle">Validated expertise across software engineering languages, programming paradigms, and interface architectures.</p>
+    </div>
+
+    <div class="certifications-grid">
+      <!-- Cert 1 -->
+      <div class="card cert-card reveal d1">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">Advanced Python Development</h3>
+          <p class="cert-issuer">LinkedIn Verified</p>
+        </div>
+      </div>
+
+      <!-- Cert 2 -->
+      <div class="card cert-card reveal d2">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">C++ Systems Programming</h3>
+          <p class="cert-issuer">LinkedIn Verified</p>
+        </div>
+      </div>
+
+      <!-- Cert 3 -->
+      <div class="card cert-card reveal d3">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">Enterprise Java Programming</h3>
+          <p class="cert-issuer">LinkedIn Verified</p>
+        </div>
+      </div>
+
+      <!-- Cert 4 -->
+      <div class="card cert-card reveal d1">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">User Experience Design & Generative AI Studio</h3>
+          <p class="cert-issuer">LinkedIn Verified</p>
+        </div>
+      </div>
+
+      <!-- Cert 5 -->
+      <div class="card cert-card reveal d2">
+        <div class="cert-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="cert-info">
+          <h3 class="cert-title">Low-Level C Systems Programming</h3>
+          <p class="cert-issuer">LinkedIn Verified</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- -------------------------------------------
      CONTACT SECTION
      Contact form and social media links.
 ------------------------------------------- -->
 <section id="contact" class="section">
 
   <!-- Background orb centered in the contact section. -->
-  <div class="orb" style="width:480px;height:480px;background:rgba(37,99,235,0.12);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+  <div class="orb" style="width:480px;height:480px;background:rgba(193,18,31,0.12);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
   <!-- transform:translate(-50%,-50%) perfectly centers the orb even though it uses top/left. -->
 
   <div class="container" style="position:relative;z-index:1">
