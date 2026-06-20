@@ -949,10 +949,10 @@ body::after{
    The three project cards.
 ------------------------------------------- */
 
-/* Three-column grid for project cards. */
+/* Auto-fitting grid for project cards. */
 .projects-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr); /* Three equal columns. */
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); /* Responsive columns. */
   gap:1.25rem;                          /* Gap between cards. */
 }
 
